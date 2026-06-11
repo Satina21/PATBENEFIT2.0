@@ -1,0 +1,2006 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>PAT BENEFIT SERVICE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+:root {
+  --bg-top: #b8e8f5;
+  --bg-mid: #d6f0f8;
+  --bg-bot: #e8f7fc;
+  --teal: #2ab5d4;
+  --teal-dark: #1a8fa8;
+  --green-icon: #3caa7e;
+  --orange-icon: #f5a623;
+  --text-dark: #1a3a4a;
+  --white: #ffffff;
+  --font: 'IBM Plex Sans Thai', sans-serif;
+}
+
+html, body {
+  font-family: var(--font);
+  min-height: 100vh;
+  width: 100%;
+  max-width: 100vw;
+  background: linear-gradient(160deg, #b8e8f5 0%, #cdf1f8 40%, #e2f8fd 100%);
+  overflow-x: hidden;
+}
+
+/* === SCREEN WRAPPER === */
+.screen {
+  max-width: 480px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: 100vh;
+  position: relative;
+  display: none;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+.screen.active { display: flex; }
+
+/* === FLOATING CROSSES BG === */
+.bg-crosses {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+.cross {
+  position: absolute;
+  color: var(--teal);
+  font-size: 28px;
+  opacity: 0.18;
+  font-weight: 300;
+  line-height: 1;
+  user-select: none;
+}
+
+/* === HOME SCREEN === */
+#screen-home {
+  padding: 0 0 30px;
+}
+
+.home-header {
+  position: relative;
+  z-index: 10;
+  padding: 52px 16px 20px;
+  text-align: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+/* Medical icons top row */
+.header-icons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+  padding: 0 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.hex-icon {
+  width: 46px; height: 46px;
+  background: rgba(255,255,255,0.35);
+  border: 1.5px solid rgba(255,255,255,0.6);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+  backdrop-filter: blur(4px);
+  flex-shrink: 0;
+}
+
+.header-center-icon {
+  width: 64px; height: 64px;
+  background: rgba(255,255,255,0.5);
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 18px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 30px;
+  box-shadow: 0 4px 16px rgba(42,181,212,0.25);
+}
+
+.main-title {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: 0.5px;
+  text-shadow: 0 2px 8px rgba(255,255,255,0.6);
+  line-height: 1.2;
+}
+
+.main-subtitle {
+  font-size: 13px;
+  color: rgba(26,58,74,0.65);
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ECG line decoration */
+.ecg-line {
+  width: 100%;
+  height: 32px;
+  margin: 10px 0 0;
+  opacity: 0.35;
+}
+
+/* === MENU GRID === */
+.menu-section {
+  position: relative;
+  z-index: 10;
+  padding: 0 14px 14px;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.menu-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  width: 100%;
+}
+
+.menu-card {
+  background: rgba(255,255,255,0.72);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  border: 1.5px solid rgba(255,255,255,0.85);
+  box-shadow: 0 4px 20px rgba(42,181,212,0.12), 0 1px 4px rgba(0,0,0,0.06);
+  padding: 16px 10px 14px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.menu-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+  border-radius: 22px 22px 0 0;
+}
+
+.menu-card.card-blue::before { background: linear-gradient(90deg, #2ab5d4, #5dcbe8); }
+.menu-card.card-red::before { background: linear-gradient(90deg, #e05a5a, #f07878); }
+.menu-card.card-green::before { background: linear-gradient(90deg, #3caa7e, #5dc99d); }
+.menu-card.card-orange::before { background: linear-gradient(90deg, #f5a623, #f7c063); }
+.menu-card.card-purple::before { background: linear-gradient(90deg, #7c6fe0, #9e92f0); }
+.menu-card.card-teal2::before { background: linear-gradient(90deg, #e05a7a, #e87c9a); }
+
+.menu-card:active { transform: scale(0.95); box-shadow: 0 2px 10px rgba(42,181,212,0.1); }
+
+.menu-icon-wrap {
+  width: min(80px, 20vw); height: min(80px, 20vw);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: min(38px, 9.5vw);
+  position: relative;
+  flex-shrink: 0;
+}
+
+.menu-icon-wrap.bg-green { background: radial-gradient(circle at 40% 35%, #5dc99d, #3caa7e); box-shadow: 0 6px 18px rgba(60,170,126,0.4); }
+.menu-icon-wrap.bg-red { background: radial-gradient(circle at 40% 35%, #e87878, #e05a5a); box-shadow: 0 6px 18px rgba(224,90,90,0.4); }
+.menu-icon-wrap.bg-teal { background: radial-gradient(circle at 40% 35%, #5dcbe8, #2ab5d4); box-shadow: 0 6px 18px rgba(42,181,212,0.4); }
+.menu-icon-wrap.bg-orange { background: radial-gradient(circle at 40% 35%, #f7c063, #f5a623); box-shadow: 0 6px 18px rgba(245,166,35,0.4); }
+.menu-icon-wrap.bg-purple { background: radial-gradient(circle at 40% 35%, #9e92f0, #7c6fe0); box-shadow: 0 6px 18px rgba(124,111,224,0.4); }
+.menu-icon-wrap.bg-pink { background: radial-gradient(circle at 40% 35%, #e87c9a, #e05a7a); box-shadow: 0 6px 18px rgba(224,90,122,0.4); }
+
+.menu-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-dark);
+  text-align: center;
+  line-height: 1.3;
+}
+
+/* === INNER SCREENS === */
+.inner-screen {
+  padding: 0 0 30px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.top-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 52px 20px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: linear-gradient(180deg, rgba(184,232,245,0.98) 80%, rgba(184,232,245,0));
+}
+
+.back-btn {
+  width: 38px; height: 38px;
+  background: rgba(255,255,255,0.7);
+  border: 1.5px solid rgba(255,255,255,0.9);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: transform 0.15s;
+}
+.back-btn:active { transform: scale(0.92); }
+
+.top-bar-title {
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.content-area {
+  padding: 0 16px;
+  flex: 1;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+/* Cards for content */
+.content-card {
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(8px);
+  border-radius: 18px;
+  border: 1.5px solid rgba(255,255,255,0.9);
+  box-shadow: 0 3px 16px rgba(42,181,212,0.1);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.content-card-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--teal-dark);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Steps */
+.step-row {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(42,181,212,0.1);
+}
+.step-row:last-child { border-bottom: none; }
+
+.step-circle {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2ab5d4, #5dcbe8);
+  color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  flex-shrink: 0;
+  box-shadow: 0 3px 8px rgba(42,181,212,0.35);
+}
+
+.step-text { font-size: 14px; line-height: 1.5; color: #2a4a5a; }
+.step-sub { font-size: 12px; color: #6b8a9a; margin-top: 2px; }
+
+/* Checklist */
+.check-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(42,181,212,0.1);
+  cursor: pointer;
+  box-sizing: border-box;
+  width: 100%;
+}
+.check-item:last-child { border-bottom: none; }
+
+.check-box {
+  width: 22px; height: 22px;
+  border-radius: 7px;
+  border: 2px solid #ccc;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+  font-size: 12px;
+  transition: all 0.2s;
+  color: white;
+}
+.check-item.done .check-box { background: #3caa7e; border-color: #3caa7e; }
+.check-item.done .check-text { color: #6b8a9a; }
+.check-text { font-size: 13px; line-height: 1.5; color: #2a4a5a; flex: 1; min-width: 0; word-break: break-word; }
+
+.progress-bar-wrap { margin-bottom: 14px; }
+.prog-label { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 6px; }
+.prog-count { font-weight: 700; color: #3caa7e; }
+.prog-bg { height: 8px; background: rgba(42,181,212,0.15); border-radius: 4px; overflow: hidden; }
+.prog-fill { height: 100%; background: linear-gradient(90deg, #3caa7e, #5dc99d); border-radius: 4px; transition: width 0.4s; }
+
+/* FAQ */
+.faq-item {
+  background: rgba(255,255,255,0.78);
+  backdrop-filter: blur(8px);
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.9);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 10px rgba(42,181,212,0.08);
+}
+.faq-q {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a3a4a;
+}
+.faq-icon { font-size: 18px; flex-shrink: 0; }
+.faq-arrow { margin-left: auto; font-size: 16px; color: var(--teal); transition: transform 0.25s; flex-shrink: 0; }
+.faq-item.open .faq-arrow { transform: rotate(180deg); }
+.faq-a { padding: 0 16px 14px 44px; font-size: 13px; color: #4a6a7a; line-height: 1.7; display: none; border-top: 1px solid rgba(42,181,212,0.1); padding-top: 12px; }
+.faq-item.open .faq-a { display: block; }
+
+/* Doc type cards */
+.doc-type-card {
+  background: rgba(255,255,255,0.78);
+  border-radius: 18px;
+  border: 1.5px solid rgba(255,255,255,0.9);
+  overflow: hidden;
+  margin-bottom: 14px;
+  box-shadow: 0 3px 16px rgba(0,0,0,0.06);
+  width: 100%;
+  box-sizing: border-box;
+}
+.doc-type-header {
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  box-sizing: border-box;
+  width: 100%;
+}
+.doc-type-icon { font-size: 24px; flex-shrink: 0; }
+.doc-type-name { font-size: 14px; font-weight: 700; line-height: 1.3; }
+.doc-type-badge {
+  margin-left: auto;
+  font-size: 10px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  color: white;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.doc-type-body { padding: 0 14px 14px; box-sizing: border-box; width: 100%; }
+.doc-row { display: flex; gap: 8px; padding: 8px 0; border-top: 1px solid rgba(0,0,0,0.06); font-size: 13px; box-sizing: border-box; width: 100%; }
+.doc-row-label { color: #6b8a9a; min-width: 65px; max-width: 80px; flex-shrink: 0; font-weight: 500; font-size: 12px; }
+.doc-row-val { flex: 1; color: #1a3a4a; line-height: 1.5; min-width: 0; word-break: break-word; }
+
+/* Contact */
+.contact-card {
+  background: rgba(255,255,255,0.78);
+  border-radius: 18px;
+  border: 1.5px solid rgba(255,255,255,0.9);
+  padding: 20px;
+  margin-bottom: 12px;
+  text-align: center;
+  box-shadow: 0 3px 16px rgba(42,181,212,0.1);
+}
+.contact-icon { font-size: 40px; margin-bottom: 10px; }
+.contact-title { font-size: 15px; font-weight: 700; color: #1a3a4a; margin-bottom: 4px; }
+.contact-sub { font-size: 13px; color: #6b8a9a; line-height: 1.5; }
+.contact-btn {
+  margin-top: 14px;
+  display: inline-block;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #2ab5d4, #1a8fa8);
+  color: white;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font);
+  box-shadow: 0 4px 12px rgba(42,181,212,0.3);
+}
+
+/* Tip box */
+.tip-box {
+  background: rgba(42,181,212,0.1);
+  border-left: 3px solid var(--teal);
+  border-radius: 0 12px 12px 0;
+  padding: 12px 14px;
+  font-size: 13px;
+  color: #1a5a6a;
+  line-height: 1.5;
+  margin-bottom: 14px;
+}
+
+.section-label {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #6b8a9a;
+  margin: 14px 0 8px;
+}
+
+.not-allowed { color: #e05a5a; }
+
+/* Reset btn */
+.reset-btn {
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  width: 100%; padding: 13px;
+  background: rgba(255,255,255,0.6);
+  border: 1.5px dashed rgba(42,181,212,0.4);
+  border-radius: 14px;
+  color: #6b8a9a;
+  font-family: var(--font); font-size: 13px;
+  cursor: pointer; margin-top: 4px;
+}
+
+/* Quick prompt chips */
+.quick-chip {
+  background: rgba(255,255,255,0.8);
+  border: 1.5px solid rgba(42,181,212,0.3);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: var(--font);
+  color: #1a5a6a;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.15s;
+}
+.quick-chip:active { background: rgba(42,181,212,0.15); }
+
+/* Hospital tabs */
+.htab {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid rgba(42,181,212,0.25);
+  background: rgba(255,255,255,0.7);
+  font-family: var(--font);
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b8a9a;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.htab-active {
+  background: linear-gradient(135deg,#2ab5d4,#1a8fa8);
+  color: white;
+  border-color: transparent;
+}
+
+/* AI message bubbles */
+.ai-bubble-user {
+  background: linear-gradient(135deg,#2ab5d4,#1a8fa8);
+  color: white;
+  border-radius: 16px 16px 4px 16px;
+  padding: 12px 16px;
+  font-size: 13px;
+  line-height: 1.6;
+  max-width: 85%;
+  align-self: flex-end;
+  margin-left: auto;
+}
+.ai-bubble-bot {
+  background: rgba(255,255,255,0.85);
+  border: 1.5px solid rgba(255,255,255,0.9);
+  border-radius: 16px 16px 16px 4px;
+  padding: 14px 16px;
+  font-size: 13px;
+  color: #1a3a4a;
+  line-height: 1.7;
+  max-width: 92%;
+  box-shadow: 0 2px 10px rgba(42,181,212,0.1);
+}
+.ai-typing {
+  display: flex; gap: 5px; align-items: center; padding: 8px 0;
+}
+.ai-dot {
+  width: 8px; height: 8px;
+  background: #2ab5d4;
+  border-radius: 50%;
+  animation: bounce 1.2s infinite;
+}
+.ai-dot:nth-child(2) { animation-delay: 0.2s; }
+.ai-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes bounce {
+  0%,80%,100% { transform: translateY(0); }
+  40% { transform: translateY(-6px); }
+}
+
+/* Hospital card */
+.hosp-card {
+  background: rgba(255,255,255,0.78);
+  border-radius: 16px;
+  border: 1.5px solid rgba(255,255,255,0.9);
+  padding: 14px 16px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 2px 10px rgba(42,181,212,0.08);
+}
+</style>
+</head>
+<body>
+
+<!-- BG floating crosses -->
+<div class="bg-crosses">
+  <span class="cross" style="top:6%;left:4%;font-size:22px;">+</span>
+  <span class="cross" style="top:12%;right:6%;font-size:36px;">+</span>
+  <span class="cross" style="top:28%;left:2%;font-size:18px;">+</span>
+  <span class="cross" style="top:42%;right:3%;font-size:28px;">+</span>
+  <span class="cross" style="top:58%;left:5%;font-size:40px;">+</span>
+  <span class="cross" style="top:70%;right:8%;font-size:20px;">+</span>
+  <span class="cross" style="top:82%;left:8%;font-size:30px;">+</span>
+  <span class="cross" style="bottom:8%;right:4%;font-size:48px;">+</span>
+  <span class="cross" style="bottom:18%;left:50%;font-size:22px;">+</span>
+</div>
+
+<!-- ============ HOME SCREEN ============ -->
+<div id="screen-home" class="screen active">
+  <div class="home-header">
+    <div class="header-icons">
+      <div class="hex-icon">🩺</div>
+      <div class="hex-icon">💉</div>
+      <div class="header-center-icon">🏥</div>
+      <div class="hex-icon">💊</div>
+      <div class="hex-icon">🩻</div>
+    </div>
+    <!-- ECG line -->
+    <svg class="ecg-line" viewBox="0 0 360 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polyline points="0,16 60,16 75,16 80,4 85,28 90,8 95,20 110,20 150,20 155,16 200,16 205,4 210,28 215,8 220,20 240,20 280,20 285,16 360,16" stroke="#2ab5d4" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    <div class="main-title">PAT BENEFIT SERVICE</div>
+    <div class="main-subtitle">คู่มือสวัสดิการค่ารักษาพยาบาล</div>
+  </div>
+
+  <div class="menu-section">
+    <div class="menu-grid">
+
+      <div class="menu-card card-green" onclick="goTo('screen-rights')">
+        <div class="menu-icon-wrap bg-green">🩺</div>
+        <div class="menu-label">สิทธิการรักษา</div>
+      </div>
+
+      <div class="menu-card card-red" onclick="goTo('screen-steps')">
+        <div class="menu-icon-wrap bg-red">🏥</div>
+        <div class="menu-label">ขั้นตอนเบิก</div>
+      </div>
+
+      <div class="menu-card card-teal2" onclick="goTo('screen-docs')">
+        <div class="menu-icon-wrap bg-teal">📋</div>
+        <div class="menu-label">เอกสารที่ต้องใช้</div>
+      </div>
+
+      <div class="menu-card card-orange" onclick="goTo('screen-check')">
+        <div class="menu-icon-wrap bg-orange">💊</div>
+        <div class="menu-label">ตรวจสอบยา</div>
+      </div>
+
+      <div class="menu-card card-purple" onclick="goTo('screen-faq')">
+        <div class="menu-icon-wrap bg-purple">❓</div>
+        <div class="menu-label">FAQ</div>
+      </div>
+
+      <div class="menu-card card-blue" onclick="goTo('screen-contact')">
+        <div class="menu-icon-wrap bg-pink">📞</div>
+        <div class="menu-label">ติดต่อเจ้าหน้าที่</div>
+      </div>
+
+      <div class="menu-card card-purple" onclick="goTo('screen-ai')">
+        <div class="menu-icon-wrap bg-purple">🤖</div>
+        <div class="menu-label">AI ถาม-ตอบสวัสดิการ</div>
+      </div>
+
+      <div class="menu-card card-green" onclick="goTo('screen-hospital')">
+        <div class="menu-icon-wrap bg-green">🏥</div>
+        <div class="menu-label">ค้นหาโรงพยาบาล</div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ RIGHTS SCREEN ============ -->
+<div id="screen-rights" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🩺 สิทธิการรักษา</div>
+    </div>
+    <div class="content-area">
+      <div class="tip-box">💡 แตะที่ประเภทการรักษาเพื่อดูรายละเอียด</div>
+
+      <div class="doc-type-card" onclick="goTo('screen-detail-gov')" style="cursor:pointer;">
+        <div class="doc-type-header" style="background:#e8f8f0;">
+          <div class="doc-type-icon">🏛️</div>
+          <div><div class="doc-type-name">โรงพยาบาลรัฐบาล</div></div>
+          <span class="doc-type-badge" style="background:#3caa7e;">เบิกตามจริง</span>
+          <span style="font-size:18px;color:#aaa;margin-left:6px;">›</span>
+        </div>
+      </div>
+
+      <div class="doc-type-card" onclick="goTo('screen-detail-priv')" style="cursor:pointer;">
+        <div class="doc-type-header" style="background:#fef9ea;">
+          <div class="doc-type-icon">🏢</div>
+          <div><div class="doc-type-name">โรงพยาบาลเอกชน</div></div>
+          <span class="doc-type-badge" style="background:#f5a623;">จำกัดวงเงิน</span>
+          <span style="font-size:18px;color:#aaa;margin-left:6px;">›</span>
+        </div>
+      </div>
+
+      <div class="doc-type-card" onclick="goTo('screen-detail-dental')" style="cursor:pointer;">
+        <div class="doc-type-header" style="background:#fff0f0;">
+          <div class="doc-type-icon">🦷</div>
+          <div><div class="doc-type-name">ทันตกรรม</div></div>
+          <span class="doc-type-badge" style="background:#e05a5a;">เบิกตามจริง</span>
+          <span style="font-size:18px;color:#aaa;margin-left:6px;">›</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DETAIL: โรงพยาบาลรัฐบาล ============ -->
+<div id="screen-detail-gov" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🏛️ โรงพยาบาลรัฐบาล</div>
+    </div>
+    <div class="content-area">
+
+      <div class="section-label">🏥 ผู้ป่วยใน <span style="color:#d93025; font-weight:700;">(นอนโรงพยาบาล)</span></div>
+      <div class="doc-type-card">
+        <div class="doc-type-header" style="background:#e8f8f0;">
+          <div class="doc-type-icon">🏛️</div>
+          <div><div class="doc-type-name">โรงพยาบาลรัฐ <br><span style="color:#d93025; font-weight:700;">ผู้ป่วยใน</span></div></div>
+          <span class="doc-type-badge" style="background:#3caa7e;">เบิกตามจริง</span>
+        </div>
+       <div class="doc-type-body">
+  <div class="doc-row">
+    <div class="doc-row-label">💰 วงเงิน</div>
+    <div class="doc-row-val">เบิกได้ตามระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง</div>
+  </div>
+
+  <div class="doc-row">
+    <div class="doc-row-label">🛏️ ค่าห้อง</div>
+    <div class="doc-row-val">
+      • พนักงาน สามารถเบิกค่าห้องพักได้ไม่เกิน 1,500 บาท / วัน<br>
+      • ครอบครัว สามารถเบิกค่าห้องพักได้ไม่เกิน 1,100 บาท / วัน
+    </div>
+  </div>
+
+	 <div class="doc-row">
+    <div class="doc-row-label">👤 สิทธิ์</div>
+    <div class="doc-row-val">
+      พนักงานและครอบครัว
+    </div>
+  </div>
+ 
+  <div class="doc-row">
+    <div class="doc-row-label">👨‍👩‍👧 ครอบครัว</div>
+    <div class="doc-row-val"> · พ่อ-แม่ · คู่สมรส · บุตร · หรือบุตรบุญธรรมโดยชอบด้วยกฎหมาย</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ← ปิดการ์ดก่อน แล้วหมายเหตุอยู่นอกการ์ด -->
+<div style="background:rgba(217,48,37,0.08); border:1.5px solid #d93025;
+  border-radius:12px; padding:12px 16px; margin-top:10px;">
+  <div style="color:#d93025; font-weight:700; font-size:13px;">
+    ⚠️ หมายเหตุ
+  </div>
+  <div style="color:#d93025; font-weight:700; font-size:13px; margin-top:4px;">
+    จำกัดสิทธิ์การเบิกไม่เกิน 120 วัน / ปี / 1 รหัสพนักงาน
+  </div>
+</div>
+
+      <div class="section-label">🏥 ผู้ป่วยนอก <span style="color:#d93025; font-weight:700;">(OPD)</span></div>
+      <div class="doc-type-card">
+        <div class="doc-type-header" style="background:#e8f8f0;">
+          <div class="doc-type-icon">🏛️</div>
+          <div><div class="doc-type-name">โรงพยาบาลรัฐ · <span style="color:#d93025; font-weight:700;">ผู้ป่วยนอก</span></div></div>
+          <span class="doc-type-badge" style="background:#3caa7e;">เบิกตามจริง</span>
+        </div>
+        <div class="doc-type-body">
+          <div class="doc-row"><div class="doc-row-label">💰 วงเงิน</div><div class="doc-row-val">เบิกได้ตามระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง</div></div>
+          <div class="doc-row"><div class="doc-row-label">👤 สิทธิ์</div><div class="doc-row-val">พนักงานและครอบครัว</div></div>
+          <div class="doc-row"><div class="doc-row-label">🏥 ครอบคลุม</div><div class="doc-row-val">โรงพยาบาลรัฐ และ โรงพยาบาลเอกชน</div></div>
+        </div>
+      </div>
+
+      <div class="section-label">📄 เอกสารที่ต้องใช้</div>
+      <div class="content-card" style="padding:6px 16px;">
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบเสร็จรับเงินตัวจริง พร้อมลงลายมือชื่อผู้เบิก (ลายเซ็น) ทุกฉบับ</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบรับรองแพทย์ระบุการวินิจฉัยโรค (ถ้ามี)</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">รายละเอียดการเบิกค่ารักษา</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- ============ DETAIL: โรงพยาบาลเอกชน ============ -->
+<div id="screen-detail-priv" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🏢 โรงพยาบาลเอกชน</div>
+    </div>
+    <div class="content-area">
+
+        <div class="section-label">🏥 ผู้ป่วยใน <span style="color:#d93025; font-weight:700;">(นอนโรงพยาบาล)</span></div>
+      <div class="doc-type-card">
+        <div class="doc-type-header" style="background:#fef9ea;">
+          <div class="doc-type-icon">🏢</div>
+          <div><div class="doc-type-name">โรงพยาบาลเอกชน  <br><span style="color:#d93025; font-weight:700;">ผู้ป่วยใน </span></div></div>
+          <span class="doc-type-badge" style="background:#f5a623;">จำกัดวงเงิน</span>
+        </div>
+        <div class="doc-type-body">
+         <div class="doc-row">
+  <div class="doc-row-label">💰 วงเงิน</div>
+  <div class="doc-row-val">เบิกได้ครึ่งหนึ่ง<span style="color:#d93025; font-weight:700;">ในรายการเบิกได้</span> ภายในวงเงิน       113,520 บาท/ ปี</div>
+</div>
+          <div class="doc-row">
+  <div class="doc-row-label">
+    💊 ค่าเวชภัณฑ์<br>
+     · ค่าอวัยวะเทียม
+  </div>
+
+  <div class="doc-row-val">
+    เบิกได้ตามกรมบัญชีกลาง
+  </div>
+</div>
+
+<div class="doc-row">
+  <div class="doc-row-label">
+    📋 อ้างอิง
+  </div>
+
+  <div class="doc-row-val">
+    ระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง
+  </div>
+</div>
+            <div class="doc-row">
+    <div class="doc-row-label">🛏️ ค่าห้อง</div>
+    <div class="doc-row-val">
+      • พนักงาน สามารถเบิกค่าห้องพักได้ไม่เกิน 1,500 บาท / วัน<br>
+      • ครอบครัว สามารถเบิกค่าห้องพักได้ไม่เกิน 1,100 บาท / วัน
+    </div>
+  </div>
+
+  <div class="doc-row">
+    <div class="doc-row-label">👨‍👩‍👧 ครอบครัว</div>
+    <div class="doc-row-val">· พ่อ-แม่ · คู่สมรส · บุตร · หรือบุตรบุญธรรมโดยชอบด้วยกฎหมาย</div>
+  </div>
+
+</div>
+</div>
+     
+      <div class="section-label">🏥 ผู้ป่วยนอก <span style="color:#d93025; font-weight:700;">(OPD)</span></div>
+      <div class="doc-type-card">
+        <div class="doc-type-header" style="background:#fce8e6;">
+          <div class="doc-type-icon">🏢</div>
+          <div><div class="doc-type-name">โรงพยาบาลเอกชน · <span style="color:#d93025; font-weight:700;">ผู้ป่วยนอก</span></div></div>
+          <span class="doc-type-badge" style="background:#e05a5a;">เบิกไม่ได้</span>
+        </div>
+        <div class="doc-type-body">
+          <div class="doc-row"><div class="doc-row-label">🚫 ยกเว้น</div><div class="doc-row-val">กรณีต่อไปนี้เบิกได้<br>1. อุบัติเหตุ<br>2. ถูกทำร้ายร่างกาย<br>3. ICU / CCU<br>4. ผ่าตัดภายใน 24 ชม.</div></div>
+          <div class="doc-row"><div class="doc-row-label">👤 สิทธิ์</div><div class="doc-row-val">เฉพาะพนักงานเท่านั้น ครอบคลุม โรงพยาบาลรัฐ และ โรงพยาบาลเอกชน</div></div>
+        </div>
+      </div>
+
+      <div class="section-label">📄 เอกสารที่ต้องใช้</div>
+      <div class="content-card" style="padding:6px 16px;">
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบเสร็จรับเงินตัวจริง พร้อมลงลายมือชื่อผู้เบิก (ลายเซ็น) ทุกฉบับ</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบรับรองแพทย์ระบุการวินิจฉัยโรค</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">รายละเอียดการเบิกค่ารักษา</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">หนังสือใบอนุญาตประกอบการสถานพยาบาล</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบอนุญาตให้ดำเนินการสถานพยาบาล</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">คำรับรองแพทย์ / คำรับรองของผู้ดำเนินการสถานพยาบาล</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">รพ.8 <span style="color:#d93025; font-weight:700;">(กรณีอุบัติเหตุ ฉุกเฉิน)</span></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+<!-- ============ DETAIL: ทันตกรรม ============ -->
+<div id="screen-detail-dental" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🦷 ทันตกรรม</div>
+    </div>
+    <div class="content-area">
+      <div class="doc-type-card">
+        <div class="doc-type-header" style="background:#fff0f0;">
+          <div class="doc-type-icon">🦷</div>
+          <div><div class="doc-type-name">ทันตกรรม</div></div>
+          <span class="doc-type-badge" style="background:#e05a5a;">เบิกตามจริง</span>
+        </div>
+        <div class="doc-type-body">
+          <div class="doc-row"><div class="doc-row-label">💰 วงเงิน</div><div class="doc-row-val">เบิกตามระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง </div></div>
+          <div class="doc-row"><div class="doc-row-label">✅ เบิกได้</div><div class="doc-row-val">อุด · ถอน · ขูดหินปูน · รักษารากฟัน · ใส่ฟันปลอม </div></div>
+	       <div class="doc-row"><div class="doc-row-label">👤 สิทธิ์</div><div class="doc-row-val">พนักงานและครอบครัว</div></div>
+          <div class="doc-row"><div class="doc-row-label">🚫 ไม่ได้</div><div class="doc-row-val"><span class="not-allowed">จัดฟัน · ฟอกสีฟัน · ทำวีเนียร์ </span></div></div>
+        </div>
+	</div>
+     
+	<!-- ← ปิดการ์ดก่อน แล้วหมายเหตุอยู่นอกการ์ด -->
+<div style="background:rgba(217,48,37,0.08); border:1.5px solid #d93025;
+  border-radius:12px; padding:12px 16px; margin-top:10px;">
+  <div style="color:#d93025; font-weight:700; font-size:13px;">
+    ⚠️ หมายเหตุ
+  </div>
+  <div style="color:#d93025; font-weight:700; font-size:13px; margin-top:4px;">
+    โรงพยาบาลเอกชน ไม่สามารถเบิกได้
+  </div>
+</div>
+
+      <div class="section-label">📄 เอกสารที่ต้องใช้</div>
+      <div class="content-card" style="padding:6px 16px;">
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบเสร็จรับเงินจากโรงพยาบาลตัวจริง</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ระบุประเภททันตกรรมในใบเสร็จชัดเจน</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">แบบฟอร์มเบิกจ่ายกรอกครบถ้วน ลายเซ็นครบ</div></div>
+        
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ STEPS SCREEN ============ -->
+<div id="screen-steps" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🏥 ขั้นตอนการเบิก</div>
+    </div>
+    <div class="content-area">
+      <div class="content-card">
+        <div class="step-row">
+          <div class="step-circle">1</div>
+          <div><div class="step-text" style="font-weight:600;">รับบริการและเก็บเอกสาร</div><div class="step-sub">รับใบเสร็จตัวจริง ใบรับรองแพทย์ จากสถานพยาบาล</div></div>
+        </div>
+        <div class="step-row">
+          <div class="step-circle">2</div>
+          <div><div class="step-text" style="font-weight:600;">ตรวจสอบด้วย Checklist</div><div class="step-sub">ตรวจสอบเอกสารให้ครบก่อนส่ง</div></div>
+        </div>
+        <div class="step-row">
+          <div class="step-circle">3</div>
+          <div><div class="step-text" style="font-weight:600;">กรอกแบบฟอร์มเบิกจ่าย</div><div class="step-sub">ระบุประเภทการรักษา จำนวนเงิน และข้อมูลส่วนตัว</div></div>
+        </div>
+        <div class="step-row">
+          <div class="step-circle">4</div>
+          <div><div class="step-text" style="font-weight:600;">ส่งเอกสารที่กองตรวจจ่าย</div><div class="step-sub">ยื่นเอกสารภายในระยะเวลาที่กำหนด</div></div>
+        </div>
+        <div class="step-row">
+          <div class="step-circle">5</div>
+          <div><div class="step-text" style="font-weight:600;">รับค่ารักษาพยาบาล</div><div class="step-sub">รอเงินโอนเข้าบัญชี</div></div>
+        </div>
+      </div>
+
+<div class="contact-card">
+  <div class="contact-icon">📄</div>
+  <div class="contact-title">คู่มือขั้นตอนการเบิกจ่าย</div>
+  <div class="contact-sub">ดาวน์โหลด PDF เพื่ออ่านแบบ Offline<br>หรือพิมพ์เก็บไว้ใช้งาน</div>
+  <a href="https://drive.google.com/file/d/1FKMlOWZer22ho1gsoWP6S6M7Sn1Snh9_/view?usp=sharing" target="_blank" style="text-decoration:none;">
+    <button class="contact-btn" style="margin-top:14px;width:100%;background:linear-gradient(135deg,#e05a5a,#c04040);">📥 ดาวน์โหลดคู่มือ PDF</button>
+  </a>
+</div>
+
+      <div class="content-card" style="background:rgba(42,181,212,0.1);border-color:rgba(42,181,212,0.3);">
+        <div style="font-size:14px;font-weight:700;color:#1a5a6a;margin-bottom:6px;">⏰ ระยะเวลายื่นเอกสาร</div>
+        <div style="font-size:13px;color:#2a6a7a;line-height:1.6;">ต้องยื่นภายใน <strong>1 ปี</strong> นับจากวันที่รับบริการ หากเกินกำหนดจะไม่สามารถเบิกได้</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DOCS / CHECKLIST SCREEN ============ -->
+<div id="screen-docs" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">📋 เอกสารที่ต้องใช้</div>
+    </div>
+    <div class="content-area">
+      <div class="content-card progress-bar-wrap">
+        <div class="prog-label"><span>ความคืบหน้า</span><span class="prog-count" id="prog-text">0 / 6 รายการ</span></div>
+        <div class="prog-bg"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
+      </div>
+
+      <div class="section-label">📄 เอกสารพื้นฐาน (ทุกประเภท)</div>
+      <div class="content-card" style="padding:6px 16px;">
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบเสร็จรับเงินตัวจริง พร้อมพร้อมลงลายมือชื่อผู้เบิก (ลายเซ็นต์) ทุกฉบับ </div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบรับรองแพทย์ระบุการวินิจฉัยโรค (ถ้ามี) </div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">รายละเอียดการเบิกค่ารักษา</div></div>
+      </div>
+
+      <div class="section-label">🏢 โรงพยาบาลเอกชน<span style="color:#d93025; font-weight:700;"> (เอกสารเพิ่มเติม) </span></div>
+
+      <div class="content-card" style="padding:6px 16px;">
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">หนังสือใบอนุญาตประกอบการสถานพยาบาล</div></div>
+        <div class="check-item" onclick="tc(this)"><div class="check-box"></div><div class="check-text">ใบอนุญาตให้ดำเนินการสถานพยาบาล</div></div>
+	<div class="check-item" onclick="tc(this)"><div class="check-box"></div> <div class="check-text">คำรับรองแพทย์คำรับรองแพทย์ / คำรับรองของผู้ดำเนินการสถานพยาบาล</div>
+	</div>
+	</div>
+
+	
+
+      <button class="reset-btn" onclick="resetCheck()">🔄 รีเซ็ต Checklist ทั้งหมด</button>
+    </div>
+  </div>
+</div>
+
+<!-- ============ DRUG CHECK SCREEN ============ -->
+<div id="screen-check" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">💊 ตรวจสอบยา</div>
+    </div>
+    <div class="content-area">
+
+      <div class="tip-box">💡 พิมพ์ชื่อยา (ไทย หรือ อังกฤษ) เพื่อตรวจสอบสิทธิ์การเบิก</div>
+
+      <!-- ช่องค้นหา -->
+      <div class="content-card" style="display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;">
+        <span style="font-size:22px;">🔍</span>
+        <input id="drug-input" type="text"
+          placeholder="เช่น paracetamol, amoxicillin..."
+          oninput="searchDrug()"
+          style="flex:1;border:none;background:none;font-family:var(--font);font-size:14px;outline:none;color:#1a3a4a;min-width:0;" />
+        <span id="drug-clear" onclick="clearDrug()"
+          style="font-size:20px;cursor:pointer;color:#bbb;display:none;flex-shrink:0;">✕</span>
+      </div>
+
+      <!-- กล่องแสดงผลเมื่อพิมพ์ตรงชื่อยา -->
+      <div id="drug-result" style="display:none;margin-bottom:12px;"></div>
+
+      <!-- คำแนะนำก่อนพิมพ์ -->
+      <div id="drug-hint" style="display:none;">
+        <div class="content-card" style="text-align:center;padding:28px 16px;background:rgba(42,181,212,0.06);border-color:rgba(42,181,212,0.2);">
+          <div style="font-size:36px;margin-bottom:10px;">🔍</div>
+          <div style="font-size:14px;font-weight:600;color:#1a3a4a;margin-bottom:6px;">พิมพ์ชื่อยาเพื่อตรวจสอบ</div>
+          <div style="font-size:12px;color:#6b8a9a;line-height:1.6;">ระบบจะแสดงผลทันทีว่ายานั้น<br>เบิกได้หรือไม่ได้</div>
+        </div>
+
+        <!-- รายละเอียดสิทธิ์ยา -->
+        <div class="section-label" style="margin-top:16px;">📋 ข้อมูลสิทธิ์การเบิกค่ายา</div>
+
+        <!-- Banner -->
+        <div style="background:linear-gradient(135deg,#2ab5d4,#1a8fa8);border-radius:18px;padding:16px;margin-bottom:12px;color:white;">
+          <div style="font-size:14px;font-weight:700;margin-bottom:4px;">📋 สรุปสิทธิ์การเบิกค่ายา</div>
+          <div style="font-size:12px;opacity:0.9;line-height:1.7;">ตามระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง<br>ต้องมีใบสั่งยาจากแพทย์ทุกครั้ง</div>
+        </div>
+
+        <!-- ยาในบัญชีหลัก -->
+        <div style="background:white;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div style="background:linear-gradient(90deg,#0f9d58,#34a853);padding:12px 16px;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">✅</span>
+            <div>
+              <div style="color:white;font-size:14px;font-weight:700;">ยาในบัญชีหลัก</div>
+              <div style="color:rgba(255,255,255,0.85);font-size:11px;">บัญชียาหลักแห่งชาติ</div>
+            </div>
+            <span style="margin-left:auto;background:rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">เบิกได้หมด</span>
+          </div>
+          <div style="padding:14px 16px;font-size:13px;color:#1a3a4a;line-height:1.8;">
+            ยาทุกชนิดที่อยู่ในบัญชียาหลักแห่งชาติ สามารถเบิกได้เต็มจำนวน
+          </div>
+        </div>
+
+        <!-- ยานอกบัญชีหลัก -->
+        <div style="background:white;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div style="background:linear-gradient(90deg,#f5a623,#f7c063);padding:12px 16px;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">⚠️</span>
+            <div>
+              <div style="color:white;font-size:14px;font-weight:700;">ยานอกบัญชีหลัก</div>
+              <div style="color:rgba(255,255,255,0.85);font-size:11px;">มีเงื่อนไขการเบิก</div>
+            </div>
+            <span style="margin-left:auto;background:rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">มีเงื่อนไข</span>
+          </div>
+          <div style="padding:14px 16px;font-size:13px;color:#1a3a4a;line-height:1.8;">
+            <span style="color:#d93025;font-weight:700;">เบิกไม่ได้</span> โดยทั่วไป<br><br>
+            <div style="background:#f0fdf4;border-left:3px solid #0f9d58;border-radius:0 8px 8px 0;padding:10px 12px;">
+              <div style="color:#0f9d58;font-weight:700;font-size:12px;margin-bottom:4px;">✅ ยกเว้น — เบิกได้เมื่อ</div>
+              <div style="color:#1a3a4a;">• มีใบรายการยา (ชื่อยา) <br>• มีหนังสือรับรองจากแพทย์<br>• มีหนังสือเพื่อประกอบการเบิกจ่ายกรณีผู้ป่วยจำเป็นต้องใช้ยานอกบัญชียาหลักแห่งชาติ</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- อาหารเสริมและเวชสำอาง -->
+        <div style="background:white;border-radius:16px;overflow:hidden;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div style="background:linear-gradient(90deg,#e05a5a,#f07878);padding:12px 16px;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">🚫</span>
+            <div>
+              <div style="color:white;font-size:14px;font-weight:700;">อาหารเสริมและเวชสำอาง</div>
+              <div style="color:rgba(255,255,255,0.85);font-size:11px;">ส่วนใหญ่เบิกไม่ได้</div>
+            </div>
+            <span style="margin-left:auto;background:rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">เบิกไม่ได้</span>
+          </div>
+          <div style="padding:14px 16px;font-size:13px;color:#1a3a4a;line-height:1.8;">
+            <span style="color:#d93025;font-weight:700;">เบิกไม่ได้</span> โดยทั่วไป<br><br>
+          </div>
+        </div>
+
+        <!-- วัคซีน -->
+        <div style="background:white;border-radius:16px;overflow:hidden;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,0.08);">
+          <div style="background:linear-gradient(90deg,#2ab5d4,#5dcbe8);padding:12px 16px;display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">💉</span>
+            <div>
+              <div style="color:white;font-size:14px;font-weight:700;">วัคซีน</div>
+              <div style="color:rgba(255,255,255,0.85);font-size:11px;">มีเงื่อนไขการเบิก</div>
+            </div>
+            <span style="margin-left:auto;background:rgba(255,255,255,0.25);color:white;font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;">มีเงื่อนไข</span>
+          </div>
+          <div style="padding:14px 16px;font-size:13px;color:#1a3a4a;line-height:1.8;">
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #f0f0f0;">
+                  </div>
+            <div style="padding:8px 0 4px;">
+              <div style="display:flex;justify-content:space-between;align-items:center;">
+                <span>วัคซีน</span>
+                <span style="background:#fce8e6;color:#d93025;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;white-space:nowrap;margin-left:8px;">🚫 เบิกไม่ได้</span>
+              </div>
+              <div style="background:#f0fdf4;border-left:3px solid #0f9d58;border-radius:0 8px 8px 0;padding:8px 12px;margin-top:8px;">
+                <div style="color:#0f9d58;font-weight:700;font-size:12px;margin-bottom:2px;">✅ ยกเว้น — เบิกได้เมื่อ</div>
+                <div style="color:#1a3a4a;font-size:12px;">มีคำรับรองแพทย์ และมีความจำเป็นต้องใช้</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- สถานะโหลด -->
+      <div id="drug-loading" class="content-card" style="text-align:center;padding:24px;color:#6b8a9a;font-size:13px;">
+        ⏳ กำลังโหลดรายการยาจาก Google Sheet...
+      </div>
+
+      <!-- ตารางรายการยา -->
+      <div id="drug-table-wrap" style="display:none;">
+        <div class="section-label" id="drug-count-label">📋 รายการยาทั้งหมด</div>
+        <div class="content-card" style="padding:6px 16px;" id="drug-table"></div>
+      </div>
+
+      <!-- Error -->
+      <div id="drug-error" style="display:none;">
+        <div class="content-card" style="background:rgba(224,90,90,0.08);border-color:rgba(224,90,90,0.25);text-align:center;padding:20px;">
+          <div style="font-size:28px;margin-bottom:8px;">⚠️</div>
+          <div style="font-size:14px;font-weight:700;color:#c04040;margin-bottom:6px;">โหลดข้อมูลไม่ได้</div>
+          <div style="font-size:12px;color:#a03030;line-height:1.6;">กรุณาตรวจสอบ URL ของ Google Sheet<br>หรือการตั้งค่า Apps Script</div>
+          <button onclick="loadDrugs()" style="margin-top:12px;padding:8px 20px;background:#2ab5d4;color:white;border:none;border-radius:10px;font-family:var(--font);font-size:13px;cursor:pointer;">🔄 ลองใหม่</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ FAQ SCREEN ============ -->
+<div id="screen-faq" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">❓ FAQ</div>
+    </div>
+    <div class="content-area">
+      <div class="tip-box">💡 แตะที่คำถามเพื่อดูคำตอบ</div>
+
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🧾</span>ใบเสร็จหายต้องทำอย่างไร?<span class="faq-arrow">⌄</span></div><div class="faq-a"> กรณี ใบเสร็จรับเงินค่ารักษาพยาบาลฉบับจริงสูญหาย ผู้มีสิทธิต้องดำเนินการแจ้งความ ณ สถานีตำรวจ เพื่อขอเอกสารใบแจ้งความ จากนั้นนำใบแจ้งความติดต่อโรงพยาบาลเพื่อขอคัดสำเนาใบเสร็จรับเงินแทนฉบับจริง เมื่อได้รับสำเนาใบเสร็จรับเงินแล้ว ผู้มีสิทธิต้องจัดทำบันทึกข้อความรับรองเอกสาร พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง เพื่อประกอบการเบิกจ่ายค่ารักษาพยาบาลผ่านระบบ HRIS ต่อไป </div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">📅</span>ส่งเอกสารได้ภายในกี่วัน?<span class="faq-arrow">⌄</span></div><div class="faq-a">ต้องยื่นเอกสารภายใน 1 ปี นับจากวันที่รับบริการ หากพ้นกำหนดจะไม่สามารถเบิกได้</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">📤</span>ทำไมเอกสารถูกส่งคืน?<span class="faq-arrow">⌄</span></div><div class="faq-a">🔴 ใบเสร็จไม่มีตราประทับ<br>🔴 แบบฟอร์มกรอกไม่ครบหรือลายเซ็นขาด<br>🔴 ไม่แนบใบรับรองแพทย์<br>🔴 ยอดเงินไม่ตรงกับใบเสร็จ</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🦷</span>จัดฟันเบิกได้ไหม?<span class="faq-arrow">⌄</span></div><div class="faq-a">ไม่ได้ ค่าจัดฟันเป็นการรักษาเพื่อความสวยงาม ไม่อยู่ในสิทธิ์การเบิก ประเภทที่เบิกได้ ได้แก่ อุด ถอน ขูดหินปูน และรักษารากฟัน</div></div>
+
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">💊</span>ซื้อยาเองไม่มีใบสั่งแพทย์เบิกได้ไหม?<span class="faq-arrow">⌄</span></div><div class="faq-a">ไม่ได้ การเบิกค่ายาต้องมีใบสั่งยาจากแพทย์ทุกครั้ง ยาที่ซื้อเองตามร้านขายยาโดยไม่มีใบสั่งแพทย์ไม่สามารถเบิกได้</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ CONTACT SCREEN ============ -->
+<div id="screen-contact" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">📞 ติดต่อเจ้าหน้าที่</div>
+    </div>
+    <div class="content-area">
+
+      <!-- ปุ่มระบบ HRIS -->
+      <div class="contact-card">
+        <div class="contact-icon">🖥️</div>
+        <div class="contact-title">ตรวจสอบสถานะการเบิกจ่าย</div>
+        <div class="contact-sub">เข้าสู่ระบบด้วย User และ Password<br>ของท่านเพื่อตรวจสอบสถานะ</div>
+        <a href="https://hris.port.co.th/" target="_blank" style="text-decoration:none;">
+          <button class="contact-btn" style="margin-top:14px;width:100%;">🔐 เข้าสู่ระบบ HRIS</button>
+        </a>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-icon">📞</div>
+        <div class="contact-title">กองตรวจจ่าย ฝ่ายการเงินและบัญชี</div>
+        <div class="contact-sub">สอบถามสถานะการเบิกจ่าย<br>และข้อสงสัยเกี่ยวกับเอกสาร</div>
+        <div style="margin-top:10px;font-size:15px;font-weight:700;color:#1a3a4a;">📞 02-269-5599<br>📞 02-269-5601</div><a href="tel:022695599"><button class="contact-btn" style="margin-top:10px;margin-right:8px;">โทร 02-269-5599</button></a><a href="tel:022695601"><button class="contact-btn" style="margin-top:10px;">โทร 02-269-5601</button></a>
+      </div>
+
+      <div class="contact-card">
+        <div class="contact-icon">💊</div>
+        <div class="contact-title">สำนักแพทย์การท่าเรือ (ห้องยา)</div>
+        <div class="contact-sub">สอบถามการเบิกค่ายา<br>และข้อสงสัยเกี่ยวกับยา</div>
+        <div style="margin-top:10px;font-size:15px;font-weight:700;color:#1a3a4a;">📞 02-229-9324 (สายนอก)</div>
+        <a href="tel:022299324"><button class="contact-btn" style="margin-top:10px;width:100%;">โทร 02-229-9324</button></a>
+      </div>
+
+      <div class="content-card" style="background:rgba(42,181,212,0.08);border-color:rgba(42,181,212,0.25);">
+        <div style="font-size:14px;font-weight:700;color:#1a5a6a;margin-bottom:10px;">⏰ เวลาทำการ</div>
+        <div style="font-size:13px;color:#2a6a7a;line-height:2;">
+          วันจันทร์ – ศุกร์<br>
+          <strong>08:30 – 16:30 น.</strong><br>
+          <span style="color:#999;">(ยกเว้นวันหยุดราชการ)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ AI CHATBOT SCREEN ============ -->
+<div id="screen-ai" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🤖 AI ถาม-ตอบสวัสดิการ</div>
+    </div>
+    <div class="content-area" style="display:flex;flex-direction:column;">
+
+      <!-- Input area (top) -->
+      <div style="margin-bottom:12px;">
+        <div class="content-card" style="display:flex;align-items:flex-end;gap:10px;padding:10px 14px;margin-bottom:0;">
+          <textarea id="ai-input" rows="1" placeholder="พิมพ์คำถามของคุณ..." oninput="autoResize(this)"
+            style="flex:1;border:none;background:none;font-family:var(--font);font-size:14px;outline:none;color:#1a3a4a;resize:none;min-height:22px;max-height:100px;line-height:1.5;"></textarea>
+          <button onclick="sendAI()" id="ai-send-btn"
+            style="width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,#2ab5d4,#1a8fa8);border:none;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;box-shadow:0 3px 8px rgba(42,181,212,0.4);">➤</button>
+        </div>
+      </div>
+
+      <!-- Quick prompts -->
+      <div style="margin-bottom:14px;">
+        <div style="font-size:12px;font-weight:700;color:#6b8a9a;margin-bottom:8px;">คำถามยอดนิยม</div>
+        <div style="display:flex;flex-wrap:wrap;gap:8px;">
+          <button onclick="setAIPrompt('รักษาที่รพ.เอกชน เบิกได้เท่าไหร่?')" class="quick-chip">รพ.เอกชน เบิกได้เท่าไหร่?</button>
+          <button onclick="setAIPrompt('เอกสารที่ต้องใช้ในการเบิกมีอะไรบ้าง?')" class="quick-chip">เอกสารที่ต้องใช้?</button>
+          <button onclick="setAIPrompt('ผ่าตัดฉุกเฉินที่รพ.เอกชน เบิกได้ไหม?')" class="quick-chip">ผ่าตัดฉุกเฉิน เบิกได้ไหม?</button>
+          <button onclick="setAIPrompt('ทันตกรรม เบิกอะไรได้บ้าง?')" class="quick-chip">ทันตกรรม เบิกอะไรได้?</button>
+          <button onclick="setAIPrompt('ครอบครัวใครบ้างที่ใช้สิทธิ์ได้?')" class="quick-chip">ครอบครัวใครใช้สิทธิ์ได้?</button>
+        </div>
+      </div>
+
+      <!-- Chat area -->
+      <div id="ai-chat-box" style="min-height:200px;margin-bottom:14px;display:flex;flex-direction:column;gap:10px;">
+        <div style="background:rgba(42,181,212,0.1);border-radius:16px 16px 16px 4px;padding:14px 16px;font-size:13px;color:#1a3a4a;line-height:1.7;max-width:90%;">
+          <div style="font-size:11px;font-weight:700;color:#2ab5d4;margin-bottom:6px;">🤖 PAT AI Assistant</div>
+          สวัสดีครับ! ผมคือ AI ผู้ช่วยด้านสวัสดิการค่ารักษาพยาบาลของการท่าเรือแห่งประเทศไทย<br><br>
+          สามารถถามเรื่อง <strong>สิทธิการรักษา วงเงิน เอกสาร หรือขั้นตอนการเบิก</strong> ได้เลยครับ 😊
+        </div>
+      </div>
+
+      <!-- Chat history panel (collapsible, at the bottom) -->
+      <div id="ai-history-panel" style="display:none;margin-bottom:16px;">
+        <div style="background:rgba(255,255,255,0.72);border-radius:14px;border:1.5px solid rgba(255,255,255,0.85);box-shadow:0 2px 10px rgba(42,181,212,0.08);overflow:hidden;">
+          <div onclick="toggleHistory()" style="display:flex;align-items:center;gap:8px;padding:10px 14px;cursor:pointer;">
+            <span style="font-size:14px;">🕐</span>
+            <span style="font-size:12px;font-weight:700;color:#1a3a4a;flex:1;">ประวัติการแชท (เก็บ 1 ชั่วโมง)</span>
+            <span id="ai-history-arrow" style="font-size:11px;color:#2ab5d4;">▶</span>
+          </div>
+          <div id="ai-history-body" style="display:none;padding:0 14px 12px;max-height:200px;overflow-y:auto;">
+            <div id="ai-history-list"></div>
+            <button onclick="clearHistory()" style="margin-top:8px;font-size:11px;color:#d93025;background:none;border:1px solid #f5c5c5;border-radius:8px;padding:4px 12px;cursor:pointer;font-family:var(--font);">🗑️ ลบประวัติ</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ HOSPITAL SEARCH SCREEN ============ -->
+<div id="screen-hospital" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🏥 ค้นหาโรงพยาบาล</div>
+    </div>
+    <div class="content-area">
+      <div class="tip-box">💡 ค้นหาโรงพยาบาลทั่วประเทศไทย หรือแตะ "ใกล้ฉัน" เพื่อหาจากตำแหน่งปัจจุบัน</div>
+
+      <!-- Near me status box -->
+      <div id="nearby-box" style="display:none;margin-bottom:12px;">
+        <div class="content-card" style="background:rgba(42,181,212,0.08);border-color:rgba(42,181,212,0.25);padding:14px 16px;">
+          <div id="nearby-status" style="font-size:13px;color:#1a5a6a;text-align:center;">📍 กำลังระบุตำแหน่ง...</div>
+        </div>
+      </div>
+
+      <!-- Thailand-wide search hint (shows when typing in all-mode) -->
+      <div id="th-search-hint" style="display:none;margin-bottom:8px;">
+        <div style="font-size:11px;color:#6b8a9a;padding:0 4px;">🔍 ค้นหาจากโรงพยาบาลทั่วประเทศไทย</div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div style="display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap;">
+        <button onclick="filterHospital('all')" id="htab-all" class="htab htab-active">ทั้งหมด</button>
+        <button onclick="filterHospital('direct')" id="htab-direct" class="htab">🟢 เบิกตามจริง</button>
+        <button onclick="filterHospital('reimburse')" id="htab-reimburse" class="htab">🟡 จำกัดวงเงิน</button>
+        <button onclick="filterHospital('nearby')" id="htab-nearby" class="htab">📍 ใกล้ฉัน</button>
+      </div>
+
+      <!-- Search box -->
+      <div class="content-card" style="display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;">
+        <span style="font-size:20px;">🔍</span>
+        <input id="hosp-input" type="text" placeholder="ค้นหาชื่อโรงพยาบาล..." oninput="searchHospital()"
+          style="flex:1;border:none;background:none;font-family:var(--font);font-size:14px;outline:none;color:#1a3a4a;min-width:0;" />
+        <span id="hosp-clear" onclick="clearHospital()" style="font-size:20px;cursor:pointer;color:#bbb;display:none;flex-shrink:0;">✕</span>
+      </div>
+
+      <div id="hosp-list"></div>
+      <!-- Thailand-wide AI search results -->
+      <div id="th-hosp-result" style="display:none;margin-top:4px;"></div>
+    </div>
+  </div>
+</div>
+
+
+<script>
+// =====================================================
+// 🔧 URL จาก Google Apps Script
+// =====================================================
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwzx2priCtkXGy3UdVo0oEJiFes6oeQ6HO-Z9XT8qEeFyHE_ibVkjahXf6L-KktPEVN/exec';
+// =====================================================
+
+// =====================================================
+// 🤖 AI CHATBOT
+// =====================================================
+const BENEFIT_CONTEXT = `
+คุณคือ AI ผู้ช่วยด้านสวัสดิการค่ารักษาพยาบาลของ "การท่าเรือแห่งประเทศไทย (กทท.)"
+ตอบคำถามตามระเบียบต่อไปนี้เท่านั้น อย่าตอบเรื่องอื่น:
+
+=== สิทธิ์รักษาพยาบาล (ระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง) ===
+
+[โรงพยาบาลรัฐ - ผู้ป่วยใน IPD]
+- เบิกได้ตามจริง ไม่จำกัดวงเงิน
+- ค่าห้องพัก: พนักงาน ≤ 1,500 บาท/วัน, ครอบครัว ≤ 1,100 บาท/วัน
+- สิทธิ์: พนักงานและครอบครัว (พ่อ/แม่/คู่สมรส/บุตร/บุตรบุญธรรมโดยชอบด้วยกฎหมาย)
+- จำกัด 120 วัน/ปี/รหัสพนักงาน
+
+[โรงพยาบาลรัฐ - ผู้ป่วยนอก OPD]
+- เบิกได้ตามจริง ครอบคลุมทั้งรพ.รัฐและเอกชน
+- สิทธิ์: พนักงานและครอบครัว
+
+[โรงพยาบาลเอกชน - ผู้ป่วยใน IPD]
+- เบิกได้ครึ่งหนึ่งของรายการที่เบิกได้ ภายในวงเงิน 113,520 บาท/ปี
+- ค่าเวชภัณฑ์/อวัยวะเทียม: เบิกตามกรมบัญชีกลาง
+- ค่าห้องพัก: พนักงาน ≤ 1,500 บาท/วัน, ครอบครัว ≤ 1,100 บาท/วัน
+
+[โรงพยาบาลเอกชน - ผู้ป่วยนอก OPD]
+- เบิกไม่ได้ โดยทั่วไป
+- ยกเว้น: 1) อุบัติเหตุ 2) ถูกทำร้ายร่างกาย 3) ICU/CCU 4) ผ่าตัดภายใน 24 ชม.
+- สิทธิ์: เฉพาะพนักงานเท่านั้น
+
+[ทันตกรรม]
+- เบิกได้: อุด ถอน ขูดหินปูน รักษารากฟัน ใส่ฟันปลอม
+- เบิกไม่ได้: จัดฟัน ฟอกสีฟัน ทำวีเนียร์
+- ใช้ได้เฉพาะโรงพยาบาลรัฐเท่านั้น
+- สิทธิ์: พนักงานและครอบครัว
+
+[ยา]
+- ยาในบัญชียาหลักแห่งชาติ: เบิกได้เต็มจำนวน
+- ยานอกบัญชียาหลัก: เบิกได้เมื่อมีใบรายการยา + หนังสือรับรองแพทย์ + หนังสือประกอบการเบิกกรณีจำเป็น
+- อาหารเสริม/เวชสำอาง: เบิกไม่ได้
+- วัคซีน: เบิกไม่ได้ ยกเว้นมีคำรับรองแพทย์และมีความจำเป็น
+
+[เอกสารพื้นฐาน]
+- ใบเสร็จรับเงินตัวจริง + ลายเซ็นผู้เบิก ทุกฉบับ
+- ใบรับรองแพทย์ระบุการวินิจฉัยโรค
+- รายละเอียดการเบิกค่ารักษา
+
+[เอกสารเพิ่มเติม รพ.เอกชน]
+- หนังสือใบอนุญาตประกอบการสถานพยาบาล
+- ใบอนุญาตให้ดำเนินการสถานพยาบาล
+- คำรับรองแพทย์/คำรับรองของผู้ดำเนินการสถานพยาบาล
+- รพ.8 (กรณีอุบัติเหตุ ฉุกเฉิน)
+
+[กรณีใบเสร็จหาย]
+- แจ้งความที่สถานีตำรวจ → ขอสำเนาใบเสร็จจากรพ. → ทำบันทึกข้อความรับรองเอกสาร + ลายเซ็น
+
+[ระยะเวลายื่นเอกสาร]
+- ต้องยื่นภายใน 1 ปี นับจากวันรับบริการ
+
+ตอบสั้น กระชับ เป็นภาษาไทย เป็นมิตร ใช้ bullet points เมื่อเหมาะสม
+ถ้าไม่มีข้อมูลในขอบเขตนี้ให้บอกว่า "กรุณาติดต่อเจ้าหน้าที่โดยตรง โทร 02-269-5599"
+`;
+
+let aiChatHistory = [];
+let aiIsLoading = false;
+
+// ==============================
+// Chat session storage (1 hour)
+// ==============================
+const CHAT_STORAGE_KEY = 'pat_ai_chat_session';
+const CHAT_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+function saveChatSession() {
+  const session = {
+    history: aiChatHistory,
+    ts: Date.now()
+  };
+  try { sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(session)); } catch(e) {}
+}
+
+function loadChatSession() {
+  try {
+    const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
+    if (!raw) return null;
+    const session = JSON.parse(raw);
+    if (Date.now() - session.ts > CHAT_TTL_MS) {
+      sessionStorage.removeItem(CHAT_STORAGE_KEY);
+      return null;
+    }
+    return session;
+  } catch(e) { return null; }
+}
+
+function initChatHistory() {
+  const session = loadChatSession();
+  const histPanel = document.getElementById('ai-history-panel');
+  const histList = document.getElementById('ai-history-list');
+
+  if (session && session.history.length > 0) {
+    aiChatHistory = session.history;
+    // Build history list entries (pairs)
+    const pairs = [];
+    for (let i = 0; i < session.history.length; i += 2) {
+      if (session.history[i] && session.history[i+1]) {
+        pairs.push({ q: session.history[i].content, a: session.history[i+1].content });
+      }
+    }
+    if (pairs.length > 0) {
+      histList.innerHTML = pairs.map((p, idx) => `
+        <div style="padding:8px 0;border-bottom:1px solid rgba(42,181,212,0.1);">
+          <div style="font-size:12px;font-weight:700;color:#2ab5d4;margin-bottom:2px;">🙋 ${p.q}</div>
+          <div style="font-size:11px;color:#4a6a7a;line-height:1.5;">${p.a.replace(/\n/g,'<br>').substring(0,120)}${p.a.length>120?'...':''}</div>
+        </div>`).join('');
+      histPanel.style.display = 'block';
+    }
+  }
+}
+
+function toggleHistory() {
+  const body = document.getElementById('ai-history-body');
+  const arrow = document.getElementById('ai-history-arrow');
+  const isOpen = body.style.display !== 'none';
+  body.style.display = isOpen ? 'none' : 'block';
+  arrow.textContent = isOpen ? '▶' : '▼';
+}
+
+function clearHistory() {
+  sessionStorage.removeItem(CHAT_STORAGE_KEY);
+  aiChatHistory = [];
+  document.getElementById('ai-history-panel').style.display = 'none';
+  document.getElementById('ai-history-list').innerHTML = '';
+}
+
+function setAIPrompt(text) {
+  document.getElementById('ai-input').value = text;
+  autoResize(document.getElementById('ai-input'));
+  sendAI();
+}
+
+function autoResize(el) {
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
+}
+
+async function sendAI() {
+  if (aiIsLoading) return;
+  const input = document.getElementById('ai-input');
+  const q = input.value.trim();
+  if (!q) return;
+
+  input.value = '';
+  input.style.height = 'auto';
+  aiIsLoading = true;
+
+  const chatBox = document.getElementById('ai-chat-box');
+
+  // User bubble
+  const userDiv = document.createElement('div');
+  userDiv.className = 'ai-bubble-user';
+  userDiv.textContent = q;
+  chatBox.appendChild(userDiv);
+
+  // Typing indicator
+  const typingDiv = document.createElement('div');
+  typingDiv.className = 'ai-bubble-bot';
+  typingDiv.innerHTML = '<div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
+  chatBox.appendChild(typingDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+
+  aiChatHistory.push({ role: 'user', content: q });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: BENEFIT_CONTEXT,
+        messages: aiChatHistory
+      })
+    });
+    const data = await res.json();
+    const answer = data.content && data.content[0] ? data.content[0].text : 'ขออภัย ไม่สามารถตอบได้ในขณะนี้';
+    aiChatHistory.push({ role: 'assistant', content: answer });
+
+    // Save session (1 hour TTL)
+    saveChatSession();
+
+    // Update history panel
+    const histPanel = document.getElementById('ai-history-panel');
+    const histList = document.getElementById('ai-history-list');
+    const pairs = [];
+    for (let i = 0; i < aiChatHistory.length; i += 2) {
+      if (aiChatHistory[i] && aiChatHistory[i+1]) {
+        pairs.push({ q: aiChatHistory[i].content, a: aiChatHistory[i+1].content });
+      }
+    }
+    histList.innerHTML = pairs.map(p => `
+      <div style="padding:8px 0;border-bottom:1px solid rgba(42,181,212,0.1);">
+        <div style="font-size:12px;font-weight:700;color:#2ab5d4;margin-bottom:2px;">🙋 ${p.q}</div>
+        <div style="font-size:11px;color:#4a6a7a;line-height:1.5;">${p.a.replace(/\n/g,'<br>').substring(0,120)}${p.a.length>120?'...':''}</div>
+      </div>`).join('');
+    histPanel.style.display = 'block';
+
+    typingDiv.innerHTML = '<div style="font-size:11px;font-weight:700;color:#2ab5d4;margin-bottom:6px;">🤖 PAT AI Assistant</div>' + answer.replace(/\n/g, '<br>');
+  } catch(e) {
+    typingDiv.innerHTML = '<div style="color:#d93025;">⚠️ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</div>';
+  }
+
+  aiIsLoading = false;
+  chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter' && !e.shiftKey && document.activeElement.id === 'ai-input') {
+    e.preventDefault();
+    sendAI();
+  }
+});
+
+// Init chat history on page load
+initChatHistory();
+
+// =====================================================
+// 🏥 HOSPITAL SEARCH
+// =====================================================
+const hospitals = [
+  // รพ.รัฐ - เบิกตรง
+  { name: 'โรงพยาบาลจุฬาลงกรณ์', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลรามาธิบดี', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลศิริราช', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลภูมิพลอดุลยเดช', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลราชวิถี', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลเลิดสิน', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลนพรัตนราชธานี', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลตากสิน', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลเจริญกรุงประชารักษ์', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลกลาง', type: 'gov', direct: true, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลสมุทรปราการ', type: 'gov', direct: true, area: 'สมุทรปราการ' },
+  { name: 'โรงพยาบาลพระนั่งเกล้า', type: 'gov', direct: true, area: 'นนทบุรี' },
+  { name: 'โรงพยาบาลปทุมธานี', type: 'gov', direct: true, area: 'ปทุมธานี' },
+  // รพ.การท่าเรือ
+  { name: 'สำนักแพทย์การท่าเรือ (คลินิกในสังกัด)', type: 'pat', direct: true, area: 'กรุงเทพฯ' },
+  // รพ.เอกชน - สำรองจ่าย
+  { name: 'โรงพยาบาลบำรุงราษฎร์', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลกรุงเทพ (สาขาทั้งหมด)', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลสมิติเวช (สาขาทั้งหมด)', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลเปาโล (สาขาทั้งหมด)', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลพระรามเก้า', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลเวชธานี', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลไทยนครินทร์', type: 'private', direct: false, area: 'สมุทรปราการ' },
+  { name: 'โรงพยาบาลสำโรงการแพทย์', type: 'private', direct: false, area: 'สมุทรปราการ' },
+  { name: 'โรงพยาบาลบางปะกอก (สาขาทั้งหมด)', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลนวมินทร์ 9', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลมเหสักข์', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลพญาไท (สาขาทั้งหมด)', type: 'private', direct: false, area: 'กรุงเทพฯ' },
+];
+
+let hospFilter = 'all';
+let nearbyCoords = null;
+
+function filterHospital(f) {
+  hospFilter = f;
+  document.querySelectorAll('.htab').forEach(t => t.classList.remove('htab-active'));
+  document.getElementById('htab-' + f).classList.add('htab-active');
+
+  const nearbyBox = document.getElementById('nearby-box');
+  const thHint = document.getElementById('th-search-hint');
+
+  if (f === 'nearby') {
+    nearbyBox.style.display = 'block';
+    thHint.style.display = 'none';
+    document.getElementById('hosp-list').innerHTML = '';
+    document.getElementById('th-hosp-result').style.display = 'none';
+    getNearbyHospitals();
+  } else {
+    nearbyBox.style.display = 'none';
+    const q = document.getElementById('hosp-input').value.trim();
+    thHint.style.display = (f === 'all' && q) ? 'block' : 'none';
+    renderHospitals(q);
+  }
+}
+
+function searchHospital() {
+  const q = document.getElementById('hosp-input').value.trim();
+  document.getElementById('hosp-clear').style.display = q ? 'block' : 'none';
+
+  if (hospFilter === 'nearby') return; // don't interfere with nearby mode
+
+  const thHint = document.getElementById('th-search-hint');
+  thHint.style.display = (hospFilter === 'all' && q) ? 'block' : 'none';
+
+  // Clear previous TH results
+  document.getElementById('th-hosp-result').style.display = 'none';
+  document.getElementById('th-hosp-result').innerHTML = '';
+
+  renderHospitals(q);
+
+  // If typing in 'all' mode and local results are few, trigger TH-wide search
+  if (hospFilter === 'all' && q.length >= 2) {
+    searchThailandHospitals(q);
+  }
+}
+
+// Thailand-wide hospital search via AI (similar to drug search)
+let thSearchTimer = null;
+function searchThailandHospitals(q) {
+  clearTimeout(thSearchTimer);
+  thSearchTimer = setTimeout(async () => {
+    const resultBox = document.getElementById('th-hosp-result');
+
+    // Check if already covered by local list
+    const localMatch = hospitals.filter(h => h.name.toLowerCase().includes(q.toLowerCase()));
+    // Always show TH-wide results if local < 3
+    if (localMatch.length >= 5) {
+      resultBox.style.display = 'none';
+      return;
+    }
+
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `<div style="text-align:center;padding:14px;color:#6b8a9a;font-size:12px;">🔍 กำลังค้นหาโรงพยาบาลทั่วไทย...</div>`;
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          system: `คุณคือผู้ช่วยด้านข้อมูลโรงพยาบาลในประเทศไทย
+ตอบเฉพาะ JSON เท่านั้น ห้ามมีข้อความอื่น ห้ามมี markdown backtick
+รูปแบบ: {"hospitals":[{"name":"ชื่อโรงพยาบาล","province":"จังหวัด","type":"gov หรือ private","note":"ข้อมูลสั้นๆ"}]}
+type: "gov" = โรงพยาบาลรัฐ, "private" = โรงพยาบาลเอกชน
+สำหรับพนักงานการท่าเรือฯ: รพ.รัฐ = เบิกตามจริง, รพ.เอกชน = จำกัดวงเงิน 113,520 บ./ปี
+ถ้าไม่มีโรงพยาบาลตรงกับชื่อที่ค้นหา ให้ตอบ {"hospitals":[]}
+ค้นหาโรงพยาบาลที่มีชื่อใกล้เคียงกับที่ถามจากทั่วประเทศไทย ไม่เกิน 5 แห่ง`,
+          messages: [{ role: 'user', content: `ค้นหาโรงพยาบาลที่มีคำว่า "${q}" ในชื่อ ทั่วประเทศไทย` }]
+        })
+      });
+      const data = await res.json();
+      const text = (data.content && data.content[0] ? data.content[0].text : '').replace(/```json|```/g, '').trim();
+      const parsed = JSON.parse(text);
+      const list = parsed.hospitals || [];
+
+      if (!list.length) {
+        resultBox.style.display = 'none';
+        // AI ยืนยันแล้วว่าไม่มี → แสดงข้อความไม่พบ
+        document.getElementById('hosp-list').innerHTML = '<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">ไม่พบโรงพยาบาลที่ค้นหา</div>';
+        return;
+      }
+
+      resultBox.innerHTML = `<div style="font-size:11px;font-weight:700;color:#6b8a9a;margin-bottom:8px;padding:0 4px;">🇹🇭 ผลการค้นหาทั่วประเทศไทย</div>` +
+        list.map(h => {
+          const isGov = h.type === 'gov';
+          const badgeBg = isGov ? '#0f9d58' : '#f5a623';
+          const badgeTxt = isGov ? 'เบิกตามจริง' : 'จำกัดวงเงิน';
+          const icon = isGov ? '🏛️' : '🏢';
+          return `<div class="hosp-card">
+            <div style="font-size:28px;flex-shrink:0;">${icon}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:700;color:#1a3a4a;line-height:1.3;">${h.name}</div>
+              <div style="font-size:11px;color:#6b8a9a;margin-top:2px;">📍 ${h.province}${h.note ? ' · ' + h.note : ''}</div>
+            </div>
+            <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:${badgeBg};color:white;white-space:nowrap;flex-shrink:0;">${badgeTxt}</span>
+          </div>`;
+        }).join('');
+    } catch(e) {
+      resultBox.style.display = 'none';
+      // เกิด error → แสดงข้อความไม่พบแทน
+      const localMatch = hospitals.filter(h => h.name.toLowerCase().includes(q.toLowerCase()));
+      if (!localMatch.length) {
+        document.getElementById('hosp-list').innerHTML = '<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">ไม่พบโรงพยาบาลที่ค้นหา</div>';
+      }
+    }
+  }, 600);
+}
+
+// Nearby hospitals using geolocation
+function getNearbyHospitals() {
+  const statusEl = document.getElementById('nearby-status');
+  const hospList = document.getElementById('hosp-list');
+  const thResult = document.getElementById('th-hosp-result');
+
+  if (!navigator.geolocation) {
+    statusEl.textContent = '⚠️ อุปกรณ์ของคุณไม่รองรับการระบุตำแหน่ง';
+    return;
+  }
+
+  statusEl.innerHTML = '<span style="color:#2ab5d4;">📍 กำลังขอสิทธิ์เข้าถึงตำแหน่ง...</span>';
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      nearbyCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+      statusEl.innerHTML = `<span style="color:#0f9d58;">✅ พบตำแหน่งของคุณ · กำลังค้นหาโรงพยาบาลใกล้เคียง...</span>`;
+
+      hospList.innerHTML = '<div style="text-align:center;padding:20px;color:#6b8a9a;font-size:12px;">🔍 กำลังค้นหา...</div>';
+      thResult.style.display = 'none';
+
+      try {
+        const res = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            model: 'claude-sonnet-4-20250514',
+            max_tokens: 1000,
+            system: `คุณคือผู้ช่วยด้านข้อมูลโรงพยาบาลในประเทศไทย
+ตอบเฉพาะ JSON เท่านั้น ห้ามมีข้อความอื่น ห้ามมี markdown backtick
+รูปแบบ: {"hospitals":[{"name":"ชื่อโรงพยาบาล","area":"ย่าน/เขต","type":"gov หรือ private","distance":"ระยะทางโดยประมาณ เช่น ~1.5 กม."}]}
+type: "gov" = โรงพยาบาลรัฐ, "private" = โรงพยาบาลเอกชน
+ให้ข้อมูลโรงพยาบาลที่น่าจะอยู่ใกล้พิกัดนี้ที่สุด 6 แห่ง เรียงจากใกล้ไปไกล`,
+            messages: [{ role: 'user', content: `ค้นหาโรงพยาบาลที่ใกล้พิกัด Lat ${nearbyCoords.lat.toFixed(4)}, Lng ${nearbyCoords.lng.toFixed(4)} มากที่สุด 6 แห่ง` }]
+          })
+        });
+        const data = await res.json();
+        const text = (data.content && data.content[0] ? data.content[0].text : '').replace(/```json|```/g, '').trim();
+        const parsed = JSON.parse(text);
+        const list = parsed.hospitals || [];
+
+        statusEl.innerHTML = `<span style="color:#0f9d58;">✅ พบโรงพยาบาลใกล้คุณ ${list.length} แห่ง</span>`;
+
+        if (!list.length) {
+          hospList.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">ไม่พบโรงพยาบาลในบริเวณใกล้เคียง</div>';
+          return;
+        }
+
+        hospList.innerHTML = list.map(h => {
+          const isGov = h.type === 'gov';
+          const badgeBg = isGov ? '#0f9d58' : '#f5a623';
+          const badgeTxt = isGov ? 'เบิกตามจริง' : 'จำกัดวงเงิน';
+          const icon = isGov ? '🏛️' : '🏢';
+          return `<div class="hosp-card">
+            <div style="font-size:28px;flex-shrink:0;">${icon}</div>
+            <div style="flex:1;min-width:0;">
+              <div style="font-size:13px;font-weight:700;color:#1a3a4a;line-height:1.3;">${h.name}</div>
+              <div style="font-size:11px;color:#6b8a9a;margin-top:2px;">📍 ${h.area}${h.distance ? ' · ' + h.distance : ''}</div>
+            </div>
+            <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:${badgeBg};color:white;white-space:nowrap;flex-shrink:0;">${badgeTxt}</span>
+          </div>`;
+        }).join('');
+
+      } catch(e) {
+        statusEl.innerHTML = '<span style="color:#d93025;">⚠️ ไม่สามารถค้นหาได้ กรุณาลองใหม่</span>';
+        hospList.innerHTML = '';
+      }
+    },
+    (err) => {
+      let msg = '⚠️ ไม่สามารถระบุตำแหน่งได้';
+      if (err.code === 1) msg = '🔒 ไม่ได้รับอนุญาตให้เข้าถึงตำแหน่ง กรุณาอนุญาตในการตั้งค่า';
+      statusEl.innerHTML = `<span style="color:#d93025;">${msg}</span>`;
+      hospList.innerHTML = '';
+    },
+    { timeout: 10000, maximumAge: 60000 }
+  );
+}
+
+function clearHospital() {
+  document.getElementById('hosp-input').value = '';
+  document.getElementById('hosp-clear').style.display = 'none';
+  renderHospitals('');
+}
+
+function renderHospitals(q) {
+  let list = hospitals;
+  if (hospFilter === 'direct') list = list.filter(h => h.direct);
+  if (hospFilter === 'reimburse') list = list.filter(h => !h.direct);
+  if (q) list = list.filter(h => h.name.toLowerCase().includes(q.toLowerCase()));
+
+  const el = document.getElementById('hosp-list');
+  if (!list.length) {
+    // ถ้าอยู่ใน mode "ทั้งหมด" และมี query → รอผล AI ก่อน ไม่แสดง "ไม่พบ" ทันที
+    if (hospFilter === 'all' && q && q.length >= 2) {
+      el.innerHTML = '';
+    } else {
+      el.innerHTML = '<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">ไม่พบโรงพยาบาลที่ค้นหา</div>';
+    }
+    return;
+  }
+  el.innerHTML = list.map(h => {
+    const badgeBg = h.direct ? (h.type === 'pat' ? '#2ab5d4' : '#0f9d58') : '#f5a623';
+    const badgeTxt = h.direct ? (h.type === 'pat' ? 'สังกัด กทท.' : 'เบิกตามจริง') : 'จำกัดวงเงิน';
+    const icon = h.type === 'gov' ? '🏛️' : h.type === 'pat' ? '⚓' : '🏢';
+    const note = h.direct ? 'ไม่ต้องสำรองจ่าย' : 'สำรองจ่ายก่อน ภายในวงเงิน 113,520 บ./ปี';
+    return `<div class="hosp-card">
+      <div style="font-size:28px;flex-shrink:0;">${icon}</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:13px;font-weight:700;color:#1a3a4a;line-height:1.3;">${h.name}</div>
+        <div style="font-size:11px;color:#6b8a9a;margin-top:2px;">📍 ${h.area} · ${note}</div>
+      </div>
+      <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;background:${badgeBg};color:white;white-space:nowrap;flex-shrink:0;">${badgeTxt}</span>
+    </div>`;
+  }).join('');
+}
+
+// Init hospital list on screen load — patch goTo
+const _origGoTo = goTo;
+
+
+let drugsLoaded = false;
+
+function loadDrugs() {
+  document.getElementById('drug-loading').style.display = 'block';
+  document.getElementById('drug-table-wrap').style.display = 'none';
+  document.getElementById('drug-error').style.display = 'none';
+
+  // ใช้ JSONP เพื่อข้าม CORS
+  window.drugCallback = function(raw) {
+    try {
+      allDrugs = raw
+        .filter(function(d){ return d.name; })
+        .map(function(d){ return {
+          name: d.name,
+          ok: d.status === true || String(d.status).toUpperCase() === 'TRUE'
+        };});
+      drugsLoaded = true;
+      document.getElementById('drug-loading').style.display = 'none';
+      document.getElementById('drug-hint').style.display = 'block';
+    } catch(e) {
+      document.getElementById('drug-loading').style.display = 'none';
+      document.getElementById('drug-error').style.display = 'block';
+    }
+  };
+
+  // สร้าง script tag ดึงข้อมูลแบบ JSONP
+  var old = document.getElementById('jsonp-script');
+  if (old) old.parentNode.removeChild(old);
+  var s = document.createElement('script');
+  s.id = 'jsonp-script';
+  s.onerror = function() {
+    document.getElementById('drug-loading').style.display = 'none';
+    document.getElementById('drug-error').style.display = 'block';
+  };
+  s.src = SHEET_URL + '?callback=drugCallback';
+  document.body.appendChild(s);
+
+  // timeout 10 วิ ถ้ายังไม่ได้ให้แสดง error
+  setTimeout(function(){
+    if (!drugsLoaded) {
+      document.getElementById('drug-loading').style.display = 'none';
+      document.getElementById('drug-error').style.display = 'block';
+    }
+  }, 10000);
+}
+
+function renderDrugTable(drugs) {
+  const wrap = document.getElementById('drug-table-wrap');
+  const table = document.getElementById('drug-table');
+  const label = document.getElementById('drug-count-label');
+  const q = document.getElementById('drug-input').value.trim();
+
+  label.textContent = q
+    ? ('🔍 ผลการค้นหา (' + drugs.length + ' รายการ)')
+    : ('📋 รายการยาทั้งหมด (' + drugs.length + ' รายการ)');
+
+  if (!drugs.length) {
+    table.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">ไม่พบรายการที่ค้นหา</div>';
+    wrap.style.display = 'block';
+    return;
+  }
+
+  table.innerHTML = drugs.map(d => `
+    <div style="display:flex;justify-content:space-between;align-items:center;
+      padding:11px 0;border-bottom:1px solid rgba(42,181,212,0.1);">
+      <div style="font-size:14px;color:#1a3a4a;flex:1;padding-right:10px;">${d.name}</div>
+      <span style="font-size:11px;font-weight:700;padding:4px 10px;border-radius:20px;
+        white-space:nowrap;flex-shrink:0;
+        background:${d.ok ? '#e6f4ea' : '#fce8e6'};
+        color:${d.ok ? '#0f9d58' : '#d93025'};">
+        ${d.ok ? '✅ เบิกได้' : '🚫 เบิกไม่ได้'}
+      </span>
+    </div>`).join('');
+
+  wrap.style.display = 'block';
+}
+
+function searchDrug() {
+  const q = document.getElementById('drug-input').value.trim().toLowerCase();
+  const clearBtn = document.getElementById('drug-clear');
+  const resultBox = document.getElementById('drug-result');
+
+  clearBtn.style.display = q ? 'block' : 'none';
+  resultBox.style.display = 'none';
+
+  if (!drugsLoaded) return;
+  if (!q) {
+    document.getElementById('drug-result').style.display = 'none';
+    document.getElementById('drug-table-wrap').style.display = 'none';
+    document.getElementById('drug-hint').style.display = 'block';
+    return;
+  }
+  document.getElementById('drug-hint').style.display = 'none';
+
+  const found = allDrugs.filter(d => d.name.toLowerCase().includes(q));
+  renderDrugTable(found);
+
+  // แสดงผลใหญ่เมื่อค้นหาตรง 1 รายการพอดี
+  if (found.length === 1) {
+    const d = found[0];
+    resultBox.style.display = 'block';
+    resultBox.innerHTML = `
+      <div class="content-card" style="
+        background:${d.ok ? 'rgba(15,157,88,0.08)' : 'rgba(217,48,37,0.08)'};
+        border:2px solid ${d.ok ? '#0f9d58' : '#d93025'};
+        text-align:center;padding:24px 16px;">
+        <div style="font-size:44px;margin-bottom:10px;">${d.ok ? '✅' : '🚫'}</div>
+        <div style="font-size:17px;font-weight:700;color:#1a3a4a;margin-bottom:8px;">${d.name}</div>
+        <div style="font-size:18px;font-weight:800;color:${d.ok ? '#0f9d58' : '#d93025'};">
+          ${d.ok ? 'เบิกได้' : 'เบิกไม่ได้'}
+        </div>
+        ${!d.ok ? '<div style="font-size:12px;color:#888;margin-top:8px;">ยานี้ไม่อยู่ในสิทธิ์การเบิกจ่าย</div>' : ''}
+      </div>`;
+  }
+}
+
+function clearDrug() {
+  document.getElementById('drug-input').value = '';
+  document.getElementById('drug-clear').style.display = 'none';
+  document.getElementById('drug-result').style.display = 'none';
+  document.getElementById('drug-table-wrap').style.display = 'none';
+  document.getElementById('drug-hint').style.display = 'block';
+}
+
+const history = [];
+
+function goTo(id) {
+  const cur = document.querySelector('.screen.active');
+  if (cur) {
+    cur.classList.remove('active');
+    history.push(cur.id);
+  }
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0, 0);
+  window.history.pushState({ screen: id }, '');
+  // โหลดรายการยาครั้งแรกเมื่อเปิดหน้าตรวจสอบยา
+  if (id === 'screen-check' && !drugsLoaded) {
+    loadDrugs();
+  }
+  // รีเซ็ตหน้าโรงพยาบาลทุกครั้งที่เปิด
+  if (id === 'screen-hospital') {
+    resetHospitalScreen();
+  }
+}
+
+function resetHospitalScreen() {
+  document.getElementById('hosp-input').value = '';
+  document.getElementById('hosp-clear').style.display = 'none';
+  document.getElementById('hosp-list').innerHTML = '';
+  document.getElementById('th-hosp-result').style.display = 'none';
+  document.getElementById('th-hosp-result').innerHTML = '';
+  document.getElementById('th-search-hint').style.display = 'none';
+  document.getElementById('nearby-box').style.display = 'none';
+  hospFilter = 'all';
+  document.querySelectorAll('.htab').forEach(t => t.classList.remove('htab-active'));
+  document.getElementById('htab-all').classList.add('htab-active');
+  clearTimeout(thSearchTimer);
+}
+
+function goBack() {
+  const cur = document.querySelector('.screen.active');
+  if (cur) {
+    // ล้างข้อมูลค้นหาโรงพยาบาลเมื่อกดย้อนกลับ
+    if (cur.id === 'screen-hospital') resetHospitalScreen();
+    cur.classList.remove('active');
+  }
+  const prev = history.pop() || 'screen-home';
+  document.getElementById(prev).classList.add('active');
+  window.scrollTo(0, 0);
+  window.history.pushState({ screen: prev }, '');
+}
+
+// ปุ่มย้อนกลับ Hardware ของมือถือ (Android)
+window.addEventListener('popstate', function(e) {
+  const cur = document.querySelector('.screen.active');
+  if (cur && cur.id !== 'screen-home') {
+    if (cur.id === 'screen-hospital') resetHospitalScreen();
+    cur.classList.remove('active');
+    const prev = history.pop() || 'screen-home';
+    document.getElementById(prev).classList.add('active');
+    window.scrollTo(0, 0);
+    window.history.pushState({ screen: prev }, '');
+  } else {
+    window.history.pushState({ screen: 'screen-home' }, '');
+  }
+});
+
+function tc(item) {
+  item.classList.toggle('done');
+  item.querySelector('.check-box').textContent = item.classList.contains('done') ? '✓' : '';
+  updateProg();
+}
+
+function updateProg() {
+  const all = document.querySelectorAll('#screen-docs .check-item');
+  const done = document.querySelectorAll('#screen-docs .check-item.done');
+  document.getElementById('prog-fill').style.width = Math.round(done.length/all.length*100)+'%';
+  document.getElementById('prog-text').textContent = done.length+' / '+all.length+' รายการ';
+}
+
+function resetCheck() {
+  document.querySelectorAll('#screen-docs .check-item').forEach(i => {
+    i.classList.remove('done');
+    i.querySelector('.check-box').textContent = '';
+  });
+  updateProg();
+}
+
+function tf(item) { item.classList.toggle('open'); }
+
+// ตั้งค่า history เริ่มต้น
+window.history.replaceState({ screen: 'screen-home' }, '');
+</script>
+</body>
+</html>
