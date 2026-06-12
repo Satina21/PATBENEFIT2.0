@@ -1503,11 +1503,12 @@ function hospCardHTML(h, distLabel) {
 function renderBKKList() {
   const el = document.getElementById('hosp-list');
   if (!el) return;
-  let list = BKK_HOSPITALS;
+  // กรองเฉพาะ กทม.+ปริมณฑล จาก ALL_HOSPITALS
+  const bkkAreas = ['กรุงเทพ','สมุทรปราการ','นนทบุรี','ปทุมธานี','สมุทรสาคร'];
+  let list = ALL_HOSPITALS.filter(h => bkkAreas.some(a => h.area.includes(a)));
   if (hospTab === 'gov')     list = list.filter(h => h.type !== 'private');
   if (hospTab === 'private') list = list.filter(h => h.type === 'private');
-  // tab 'all' → แสดงทุกรายการ (ทั้งรัฐและเอกชน)
-  const label = hospTab === 'gov' ? '🏛️ โรงพยาบาลรัฐ' : hospTab === 'private' ? '🏢 โรงพยาบาลเอกชน' : '🏥 โรงพยาบาลรัฐและเอกชน';
+  const label = hospTab === 'gov' ? '🏛️ รัฐ' : hospTab === 'private' ? '🏢 เอกชน' : '🏥 รัฐและเอกชน';
   el.innerHTML =
     `<div style="font-size:12px;font-weight:700;color:#6b8a9a;margin-bottom:8px;">${label} — กรุงเทพฯ และปริมณฑล (${list.length} แห่ง)</div>` +
     list.map(h => hospCardHTML(h, null)).join('') +
@@ -1544,31 +1545,234 @@ function clearHosp() {
   renderBKKList();
 }
 
+// =====================================================
+// 🏥 FULL THAILAND HOSPITAL DATABASE (Local + AI fallback)
+// =====================================================
+const ALL_HOSPITALS = [
+  // ===== กรุงเทพมหานคร — รัฐ =====
+  { name:'โรงพยาบาลจุฬาลงกรณ์', type:'gov', area:'ปทุมวัน กรุงเทพฯ' },
+  { name:'โรงพยาบาลรามาธิบดี', type:'gov', area:'ราษฎร์บูรณะ กรุงเทพฯ' },
+  { name:'โรงพยาบาลศิริราช', type:'gov', area:'บางกอกน้อย กรุงเทพฯ' },
+  { name:'โรงพยาบาลภูมิพลอดุลยเดช', type:'gov', area:'สายไหม กรุงเทพฯ' },
+  { name:'โรงพยาบาลราชวิถี', type:'gov', area:'พญาไท กรุงเทพฯ' },
+  { name:'โรงพยาบาลเลิดสิน', type:'gov', area:'บางรัก กรุงเทพฯ' },
+  { name:'โรงพยาบาลนพรัตนราชธานี', type:'gov', area:'คลองสาน กรุงเทพฯ' },
+  { name:'โรงพยาบาลตากสิน', type:'gov', area:'คลองสาน กรุงเทพฯ' },
+  { name:'โรงพยาบาลเจริญกรุงประชารักษ์', type:'gov', area:'บางคอแหลม กรุงเทพฯ' },
+  { name:'โรงพยาบาลกลาง', type:'gov', area:'ป้อมปราบ กรุงเทพฯ' },
+  { name:'โรงพยาบาลวชิรพยาบาล', type:'gov', area:'ดุสิต กรุงเทพฯ' },
+  { name:'โรงพยาบาลกองทัพบก', type:'gov', area:'พญาไท กรุงเทพฯ' },
+  { name:'โรงพยาบาลพระมงกุฎเกล้า', type:'gov', area:'พญาไท กรุงเทพฯ' },
+  { name:'โรงพยาบาลสงฆ์', type:'gov', area:'ราษฎร์บูรณะ กรุงเทพฯ' },
+  { name:'โรงพยาบาลธนบุรี บำรุงเมือง (รัฐ)', type:'gov', area:'บางรัก กรุงเทพฯ' },
+  { name:'สำนักแพทย์การท่าเรือ', type:'pat', area:'คลองเตย กรุงเทพฯ' },
+  // ===== กรุงเทพมหานคร — เอกชน =====
+  { name:'โรงพยาบาลบำรุงราษฎร์', type:'private', area:'วัฒนา กรุงเทพฯ' },
+  { name:'โรงพยาบาลกรุงเทพ สำนักงานใหญ่', type:'private', area:'บางนา กรุงเทพฯ' },
+  { name:'โรงพยาบาลกรุงเทพ คริสเตียน', type:'private', area:'บางรัก กรุงเทพฯ' },
+  { name:'โรงพยาบาลสมิติเวช สุขุมวิท', type:'private', area:'วัฒนา กรุงเทพฯ' },
+  { name:'โรงพยาบาลสมิติเวช ศรีนครินทร์', type:'private', area:'สาทร กรุงเทพฯ' },
+  { name:'โรงพยาบาลเปาโล พหลโยธิน', type:'private', area:'จตุจักร กรุงเทพฯ' },
+  { name:'โรงพยาบาลเปาโล สมุทรปราการ', type:'private', area:'เมือง สมุทรปราการ' },
+  { name:'โรงพยาบาลพระรามเก้า', type:'private', area:'ห้วยขวาง กรุงเทพฯ' },
+  { name:'โรงพยาบาลเวชธานี', type:'private', area:'บึงกุ่ม กรุงเทพฯ' },
+  { name:'โรงพยาบาลบางปะกอก 9 อินเตอร์', type:'private', area:'ราษฎร์บูรณะ กรุงเทพฯ' },
+  { name:'โรงพยาบาลบางปะกอก 1', type:'private', area:'บางแค กรุงเทพฯ' },
+  { name:'โรงพยาบาลบางปะกอก 3', type:'private', area:'จอมทอง กรุงเทพฯ' },
+  { name:'โรงพยาบาลนวมินทร์ 9', type:'private', area:'บึงกุ่ม กรุงเทพฯ' },
+  { name:'โรงพยาบาลพญาไท 1', type:'private', area:'พญาไท กรุงเทพฯ' },
+  { name:'โรงพยาบาลพญาไท 2', type:'private', area:'ราษฎร์บูรณะ กรุงเทพฯ' },
+  { name:'โรงพยาบาลพญาไท 3', type:'private', area:'ลาดพร้าว กรุงเทพฯ' },
+  { name:'โรงพยาบาลมเหสักข์', type:'private', area:'สัมพันธวงศ์ กรุงเทพฯ' },
+  { name:'โรงพยาบาลสยามราษฎร์', type:'private', area:'ราษฎร์บูรณะ กรุงเทพฯ' },
+  { name:'โรงพยาบาลกรุงเทพคริสเตียน', type:'private', area:'บางรัก กรุงเทพฯ' },
+  { name:'โรงพยาบาลลาดพร้าว', type:'private', area:'ลาดพร้าว กรุงเทพฯ' },
+  { name:'โรงพยาบาลรามคำแหง', type:'private', area:'บึงกุ่ม กรุงเทพฯ' },
+  { name:'โรงพยาบาลกรุงเทพ ระยอง', type:'private', area:'เมือง ระยอง' },
+  { name:'โรงพยาบาลวิภาวดี', type:'private', area:'หลักสี่ กรุงเทพฯ' },
+  { name:'โรงพยาบาลสินแพทย์ รามอินทรา', type:'private', area:'คันนายาว กรุงเทพฯ' },
+  { name:'โรงพยาบาลสินแพทย์ ลำลูกกา', type:'private', area:'ลำลูกกา ปทุมธานี' },
+  { name:'โรงพยาบาลนครธน', type:'private', area:'บางแค กรุงเทพฯ' },
+  { name:'โรงพยาบาลเกษมราษฎร์ รัตนาธิเบศร์', type:'private', area:'เมือง นนทบุรี' },
+  { name:'โรงพยาบาลเกษมราษฎร์ ประชาชื่น', type:'private', area:'จตุจักร กรุงเทพฯ' },
+  { name:'โรงพยาบาลเกษมราษฎร์ ศรีบุรินทร์', type:'private', area:'เมือง เชียงราย' },
+  // ===== ปริมณฑล — รัฐ =====
+  { name:'โรงพยาบาลสมุทรปราการ', type:'gov', area:'เมือง สมุทรปราการ' },
+  { name:'โรงพยาบาลบางบ่อ', type:'gov', area:'บางบ่อ สมุทรปราการ' },
+  { name:'โรงพยาบาลพระสมุทรเจดีย์', type:'gov', area:'พระสมุทรเจดีย์ สมุทรปราการ' },
+  { name:'โรงพยาบาลพระนั่งเกล้า', type:'gov', area:'เมือง นนทบุรี' },
+  { name:'โรงพยาบาลนนทบุรี', type:'gov', area:'เมือง นนทบุรี' },
+  { name:'โรงพยาบาลปทุมธานี', type:'gov', area:'เมือง ปทุมธานี' },
+  { name:'โรงพยาบาลธัญบุรี', type:'gov', area:'ธัญบุรี ปทุมธานี' },
+  { name:'โรงพยาบาลสมุทรสาคร', type:'gov', area:'เมือง สมุทรสาคร' },
+  { name:'โรงพยาบาลนครปฐม', type:'gov', area:'เมือง นครปฐม' },
+  // ===== ปริมณฑล — เอกชน =====
+  { name:'โรงพยาบาลไทยนครินทร์', type:'private', area:'เมือง สมุทรปราการ' },
+  { name:'โรงพยาบาลสำโรงการแพทย์', type:'private', area:'สำโรง สมุทรปราการ' },
+  { name:'โรงพยาบาลบางนา 5', type:'private', area:'เมือง สมุทรปราการ' },
+  // ===== ภาคกลาง =====
+  { name:'โรงพยาบาลพระนครศรีอยุธยา', type:'gov', area:'พระนครศรีอยุธยา' },
+  { name:'โรงพยาบาลสระบุรี', type:'gov', area:'เมือง สระบุรี' },
+  { name:'โรงพยาบาลลพบุรี', type:'gov', area:'เมือง ลพบุรี' },
+  { name:'โรงพยาบาลอ่างทอง', type:'gov', area:'เมือง อ่างทอง' },
+  { name:'โรงพยาบาลสิงห์บุรี', type:'gov', area:'เมือง สิงห์บุรี' },
+  { name:'โรงพยาบาลชัยนาทนเรนทร', type:'gov', area:'เมือง ชัยนาท' },
+  // ===== ภาคเหนือ — รัฐ =====
+  { name:'โรงพยาบาลมหาราชนครเชียงใหม่', type:'gov', area:'เมือง เชียงใหม่' },
+  { name:'โรงพยาบาลนครพิงค์', type:'gov', area:'แม่ริม เชียงใหม่' },
+  { name:'โรงพยาบาลลำปาง', type:'gov', area:'เมือง ลำปาง' },
+  { name:'โรงพยาบาลลำพูน', type:'gov', area:'เมือง ลำพูน' },
+  { name:'โรงพยาบาลเชียงรายประชานุเคราะห์', type:'gov', area:'เมือง เชียงราย' },
+  { name:'โรงพยาบาลแม่สาย', type:'gov', area:'แม่สาย เชียงราย' },
+  { name:'โรงพยาบาลพะเยา', type:'gov', area:'เมือง พะเยา' },
+  { name:'โรงพยาบาลน่าน', type:'gov', area:'เมือง น่าน' },
+  { name:'โรงพยาบาลแพร่', type:'gov', area:'เมือง แพร่' },
+  { name:'โรงพยาบาลอุตรดิตถ์', type:'gov', area:'เมือง อุตรดิตถ์' },
+  { name:'โรงพยาบาลสุโขทัย', type:'gov', area:'เมือง สุโขทัย' },
+  { name:'โรงพยาบาลกำแพงเพชร', type:'gov', area:'เมือง กำแพงเพชร' },
+  { name:'โรงพยาบาลพิษณุโลก (มหาวิทยาลัยนเรศวร)', type:'gov', area:'เมือง พิษณุโลก' },
+  { name:'โรงพยาบาลพิชัย', type:'gov', area:'พิชัย อุตรดิตถ์' },
+  // ===== ภาคเหนือ — เอกชน =====
+  { name:'โรงพยาบาลกรุงเทพ เชียงใหม่', type:'private', area:'เมือง เชียงใหม่' },
+  { name:'โรงพยาบาลเชียงใหม่ราม', type:'private', area:'เมือง เชียงใหม่' },
+  { name:'โรงพยาบาลลานนา', type:'private', area:'เมือง เชียงใหม่' },
+  { name:'โรงพยาบาลแมคคอร์มิค', type:'private', area:'เมือง เชียงใหม่' },
+  { name:'โรงพยาบาลกรุงเทพ เชียงราย', type:'private', area:'เมือง เชียงราย' },
+  { name:'โรงพยาบาลเชียงรายราม', type:'private', area:'เมือง เชียงราย' },
+  // ===== ภาคตะวันออกเฉียงเหนือ — รัฐ =====
+  { name:'โรงพยาบาลศรีนครินทร์ ขอนแก่น', type:'gov', area:'เมือง ขอนแก่น' },
+  { name:'โรงพยาบาลขอนแก่น', type:'gov', area:'เมือง ขอนแก่น' },
+  { name:'โรงพยาบาลอุดรธานี', type:'gov', area:'เมือง อุดรธานี' },
+  { name:'โรงพยาบาลนครราชสีมา', type:'gov', area:'เมือง นครราชสีมา' },
+  { name:'โรงพยาบาลมหาราช นครราชสีมา', type:'gov', area:'เมือง นครราชสีมา' },
+  { name:'โรงพยาบาลอุบลราชธานี', type:'gov', area:'เมือง อุบลราชธานี' },
+  { name:'โรงพยาบาลสรรพสิทธิประสงค์', type:'gov', area:'เมือง อุบลราชธานี' },
+  { name:'โรงพยาบาลสุรินทร์', type:'gov', area:'เมือง สุรินทร์' },
+  { name:'โรงพยาบาลบุรีรัมย์', type:'gov', area:'เมือง บุรีรัมย์' },
+  { name:'โรงพยาบาลนครพนม', type:'gov', area:'เมือง นครพนม' },
+  { name:'โรงพยาบาลสกลนคร', type:'gov', area:'เมือง สกลนคร' },
+  { name:'โรงพยาบาลหนองคาย', type:'gov', area:'เมือง หนองคาย' },
+  { name:'โรงพยาบาลหนองบัวลำภู', type:'gov', area:'เมือง หนองบัวลำภู' },
+  { name:'โรงพยาบาลกาฬสินธุ์', type:'gov', area:'เมือง กาฬสินธุ์' },
+  { name:'โรงพยาบาลมุกดาหาร', type:'gov', area:'เมือง มุกดาหาร' },
+  { name:'โรงพยาบาลร้อยเอ็ด', type:'gov', area:'เมือง ร้อยเอ็ด' },
+  { name:'โรงพยาบาลมหาสารคาม', type:'gov', area:'เมือง มหาสารคาม' },
+  { name:'โรงพยาบาลชัยภูมิ', type:'gov', area:'เมือง ชัยภูมิ' },
+  { name:'โรงพยาบาลศรีสะเกษ', type:'gov', area:'เมือง ศรีสะเกษ' },
+  { name:'โรงพยาบาลยโสธร', type:'gov', area:'เมือง ยโสธร' },
+  { name:'โรงพยาบาลอำนาจเจริญ', type:'gov', area:'เมือง อำนาจเจริญ' },
+  { name:'โรงพยาบาลเลย', type:'gov', area:'เมือง เลย' },
+  // ===== ภาคตะวันออกเฉียงเหนือ — เอกชน =====
+  { name:'โรงพยาบาลกรุงเทพ ขอนแก่น', type:'private', area:'เมือง ขอนแก่น' },
+  { name:'โรงพยาบาลขอนแก่นราม', type:'private', area:'เมือง ขอนแก่น' },
+  { name:'โรงพยาบาลกรุงเทพ อุดรธานี', type:'private', area:'เมือง อุดรธานี' },
+  { name:'โรงพยาบาลอุดรธานีราม', type:'private', area:'เมือง อุดรธานี' },
+  { name:'โรงพยาบาลกรุงเทพ นครราชสีมา', type:'private', area:'เมือง นครราชสีมา' },
+  { name:'โรงพยาบาลมหาชัย โคราช', type:'private', area:'เมือง นครราชสีมา' },
+  // ===== ภาคตะวันออก — รัฐ =====
+  { name:'โรงพยาบาลระยอง', type:'gov', area:'เมือง ระยอง' },
+  { name:'โรงพยาบาลชลบุรี', type:'gov', area:'เมือง ชลบุรี' },
+  { name:'โรงพยาบาลพัทยา', type:'gov', area:'บางละมุง ชลบุรี' },
+  { name:'โรงพยาบาลฉะเชิงเทรา', type:'gov', area:'เมือง ฉะเชิงเทรา' },
+  { name:'โรงพยาบาลจันทบุรี', type:'gov', area:'เมือง จันทบุรี' },
+  { name:'โรงพยาบาลตราด', type:'gov', area:'เมือง ตราด' },
+  { name:'โรงพยาบาลปราจีนบุรี', type:'gov', area:'เมือง ปราจีนบุรี' },
+  { name:'โรงพยาบาลสระแก้ว', type:'gov', area:'เมือง สระแก้ว' },
+  // ===== ภาคตะวันออก — เอกชน =====
+  { name:'โรงพยาบาลกรุงเทพ พัทยา', type:'private', area:'บางละมุง ชลบุรี' },
+  { name:'โรงพยาบาลพัทยา อินเตอร์', type:'private', area:'บางละมุง ชลบุรี' },
+  { name:'โรงพยาบาลกรุงเทพ ระยอง', type:'private', area:'เมือง ระยอง' },
+  { name:'โรงพยาบาลระยองราม', type:'private', area:'เมือง ระยอง' },
+  { name:'โรงพยาบาลชลบุรีราม', type:'private', area:'เมือง ชลบุรี' },
+  // ===== ภาคใต้ — รัฐ =====
+  { name:'โรงพยาบาลสงขลานครินทร์', type:'gov', area:'หาดใหญ่ สงขลา' },
+  { name:'โรงพยาบาลหาดใหญ่', type:'gov', area:'หาดใหญ่ สงขลา' },
+  { name:'โรงพยาบาลสงขลา', type:'gov', area:'เมือง สงขลา' },
+  { name:'โรงพยาบาลนราธิวาส', type:'gov', area:'เมือง นราธิวาส' },
+  { name:'โรงพยาบาลปัตตานี', type:'gov', area:'เมือง ปัตตานี' },
+  { name:'โรงพยาบาลยะลา', type:'gov', area:'เมือง ยะลา' },
+  { name:'โรงพยาบาลสุราษฎร์ธานี', type:'gov', area:'เมือง สุราษฎร์ธานี' },
+  { name:'โรงพยาบาลกระบี่', type:'gov', area:'เมือง กระบี่' },
+  { name:'โรงพยาบาลภูเก็ต', type:'gov', area:'เมือง ภูเก็ต' },
+  { name:'โรงพยาบาลวชิระภูเก็ต', type:'gov', area:'เมือง ภูเก็ต' },
+  { name:'โรงพยาบาลพังงา', type:'gov', area:'เมือง พังงา' },
+  { name:'โรงพยาบาลตรัง', type:'gov', area:'เมือง ตรัง' },
+  { name:'โรงพยาบาลพัทลุง', type:'gov', area:'เมือง พัทลุง' },
+  { name:'โรงพยาบาลนครศรีธรรมราช', type:'gov', area:'เมือง นครศรีธรรมราช' },
+  { name:'โรงพยาบาลชุมพร', type:'gov', area:'เมือง ชุมพร' },
+  { name:'โรงพยาบาลระนอง', type:'gov', area:'เมือง ระนอง' },
+  { name:'โรงพยาบาลสตูล', type:'gov', area:'เมือง สตูล' },
+  // ===== ภาคใต้ — เอกชน =====
+  { name:'โรงพยาบาลกรุงเทพ หาดใหญ่', type:'private', area:'หาดใหญ่ สงขลา' },
+  { name:'โรงพยาบาลหาดใหญ่ราม', type:'private', area:'หาดใหญ่ สงขลา' },
+  { name:'โรงพยาบาลกรุงเทพ ภูเก็ต', type:'private', area:'เมือง ภูเก็ต' },
+  { name:'โรงพยาบาลมิชชั่น ภูเก็ต', type:'private', area:'เมือง ภูเก็ต' },
+  { name:'โรงพยาบาลกรุงเทพ สมุย', type:'private', area:'เกาะสมุย สุราษฎร์ธานี' },
+  { name:'โรงพยาบาลกรุงเทพ กระบี่', type:'private', area:'เมือง กระบี่' },
+  // ===== ภาคตะวันตก =====
+  { name:'โรงพยาบาลราชบุรี', type:'gov', area:'เมือง ราชบุรี' },
+  { name:'โรงพยาบาลเพชรบุรี', type:'gov', area:'เมือง เพชรบุรี' },
+  { name:'โรงพยาบาลประจวบคีรีขันธ์', type:'gov', area:'เมือง ประจวบคีรีขันธ์' },
+  { name:'โรงพยาบาลกาญจนบุรี', type:'gov', area:'เมือง กาญจนบุรี' },
+  { name:'โรงพยาบาลหัวหิน', type:'gov', area:'หัวหิน ประจวบคีรีขันธ์' },
+  { name:'โรงพยาบาลกรุงเทพ หัวหิน', type:'private', area:'หัวหิน ประจวบคีรีขันธ์' },
+];
+
 async function doHospAISearch(q) {
   const el = document.getElementById('hosp-list');
-  el.innerHTML='<div style="text-align:center;padding:20px;color:#6b8a9a;font-size:13px;">⏳ กำลังค้นหา...</div>';
+  if (!q) { renderBKKList(); return; }
+
+  // 1) ค้นหาใน local DB ก่อน (เร็ว ไม่ต้องเรียก API)
+  const qLow = q.toLowerCase().replace(/\s+/g,'');
+  let localResults = ALL_HOSPITALS.filter(h => {
+    const n = h.name.toLowerCase().replace(/\s+/g,'');
+    const a = h.area.toLowerCase().replace(/\s+/g,'');
+    return n.includes(qLow) || a.includes(qLow);
+  });
+
+  // กรอง tab
+  if (hospTab === 'gov')     localResults = localResults.filter(h => h.type !== 'private');
+  if (hospTab === 'private') localResults = localResults.filter(h => h.type === 'private');
+
+  if (localResults.length > 0) {
+    el.innerHTML =
+      `<div style="font-size:12px;color:#6b8a9a;margin-bottom:8px;">🔍 ผลการค้นหา "${q}" (${localResults.length} รายการ)</div>` +
+      localResults.map(h => hospCardHTML(h, null)).join('');
+    return;
+  }
+
+  // 2) ไม่พบใน local → ถาม AI (fallback)
+  el.innerHTML = '<div style="text-align:center;padding:20px;color:#6b8a9a;font-size:13px;">⏳ กำลังค้นหาเพิ่มเติม...</div>';
   try {
-    const typeFilter = hospTab==='gov'?'ให้เฉพาะโรงพยาบาลรัฐ':hospTab==='private'?'ให้เฉพาะโรงพยาบาลเอกชน':'ให้ทั้งรัฐและเอกชน';
-    const res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','anthropic-dangerous-direct-browser-access':'true'},
-      body:JSON.stringify({
-        model:'claude-sonnet-4-6', max_tokens:600,
-        system:`ระบบค้นหาโรงพยาบาลในประเทศไทย ${typeFilter}
-ตอบ JSON เท่านั้น ไม่มีข้อความอื่น:
-{"results":[{"name":"ชื่อโรงพยาบาล","type":"gov หรือ private","area":"เขต/อำเภอ จังหวัด"}]}
-type: gov=รัฐ/รัฐวิสาหกิจ, private=เอกชน สูงสุด 10 รายการ`,
-        messages:[{role:'user',content:`ค้นหา: "${q}"`}]
+    const typeFilter = hospTab==='gov' ? 'เฉพาะโรงพยาบาลรัฐ' : hospTab==='private' ? 'เฉพาะโรงพยาบาลเอกชน' : 'ทั้งรัฐและเอกชน';
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type':'application/json', 'anthropic-dangerous-direct-browser-access':'true' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 500,
+        system: `ค้นหาโรงพยาบาลในประเทศไทย ${typeFilter} ที่ตรงกับชื่อที่ค้นหา
+ตอบเป็น JSON เท่านั้น ไม่มีข้อความอื่น ไม่มี markdown:
+{"results":[{"name":"ชื่อเต็มโรงพยาบาล","type":"gov หรือ private","area":"เขต/อำเภอ จังหวัด"}]}
+gov=รัฐ/รัฐวิสาหกิจ, private=เอกชน, สูงสุด 8 รายการ
+ถ้าหาไม่เจอให้ตอบ: {"results":[]}`,
+        messages: [{ role:'user', content:`ค้นหา: "${q}"` }]
       })
     });
     const data = await res.json();
-    const txt = data.content&&data.content[0]?data.content[0].text:'{}';
-    let parsed; try { parsed=JSON.parse(txt.replace(/```json|```/g,'').trim()); } catch(e){parsed={results:[]};}
-    const list = parsed.results||[];
-    if (!list.length) el.innerHTML='<div style="text-align:center;padding:24px;color:#aaa;font-size:13px;">ไม่พบโรงพยาบาลที่ค้นหา<br><span style="font-size:11px;">ลองพิมพ์ชื่อใหม่</span></div>';
-    else el.innerHTML=`<div style="font-size:12px;color:#6b8a9a;margin-bottom:8px;">🔍 ผล "${q}" (${list.length} รายการ)</div>`+list.map(h=>hospCardHTML(h,null)).join('');
+    const txt = (data.content && data.content[0]) ? data.content[0].text : '{"results":[]}';
+    let parsed;
+    try { parsed = JSON.parse(txt.replace(/```json|```/g,'').trim()); } catch(e) { parsed = { results:[] }; }
+    const list = parsed.results || [];
+    if (!list.length) {
+      el.innerHTML = `<div style="text-align:center;padding:24px;color:#aaa;font-size:13px;">ไม่พบ "<strong>${q}</strong>"<br><span style="font-size:11px;">ลองพิมพ์ชื่อย่อหรือชื่อจังหวัด</span></div>`;
+    } else {
+      el.innerHTML =
+        `<div style="font-size:12px;color:#6b8a9a;margin-bottom:8px;">🔍 ผลการค้นหา "${q}" (${list.length} รายการ)</div>` +
+        list.map(h => hospCardHTML(h, null)).join('');
+    }
   } catch(e) {
-    el.innerHTML='<div style="text-align:center;padding:20px;color:#d93025;font-size:13px;">⚠️ ค้นหาไม่สำเร็จ กรุณาลองใหม่</div>';
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:#d93025;font-size:13px;">⚠️ ค้นหาไม่สำเร็จ กรุณาลองใหม่</div>';
   }
 }
 
