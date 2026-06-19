@@ -1013,6 +1013,9 @@ html, body {
         </div>
 
         <div id="drug-result" style="display:none;margin-bottom:12px;"></div>
+        <div id="drug-hint" style="display:none;text-align:center;padding:10px;font-size:12px;color:#6b8a9a;margin-bottom:8px;">
+          💡 พิมพ์ชื่อยาด้านบนเพื่อค้นหา หรือดูรายการทั้งหมดด้านล่าง
+        </div>
 
         <!-- ข้อมูลสิทธิ์ — แสดงเสมอ เป็นการ์ดกะทัดรัด -->
         <div style="margin-bottom:4px;">
@@ -1078,7 +1081,7 @@ html, body {
           <div class="content-card" style="background:rgba(224,90,90,0.08);border-color:rgba(224,90,90,0.25);text-align:center;padding:20px;">
             <div style="font-size:28px;margin-bottom:8px;">⚠️</div>
             <div style="font-size:14px;font-weight:700;color:#c04040;margin-bottom:6px;">โหลดข้อมูลไม่ได้</div>
-            <div style="font-size:12px;color:#a03030;line-height:1.6;">กรุณาตรวจสอบ URL ของ Google Sheet<br>หรือการตั้งค่า Apps Script</div>
+            <div id="drug-error-msg" style="font-size:12px;color:#a03030;line-height:1.6;">กรุณาตรวจสอบ URL ของ Google Sheet<br>หรือการตั้งค่า Apps Script</div>
             <button onclick="loadDrugs()" style="margin-top:12px;padding:8px 20px;background:#2ab5d4;color:white;border:none;border-radius:10px;font-family:var(--font);font-size:13px;cursor:pointer;">🔄 ลองใหม่</button>
           </div>
         </div>
@@ -1293,350 +1296,12 @@ html, body {
 // =====================================================
 // 🔧 URL จาก Google Apps Script
 // =====================================================
+// ⚠️ ใส่ URL ของ Google Apps Script Web App ที่ deploy แล้ว (ลงท้ายด้วย /exec)
+// Apps Script ต้องรองรับ JSONP: อ่าน query param "callback" แล้วตอบกลับเป็น
+//   callbackName([{name:"...", status:true/"TRUE"}, ...])
+// ถ้ายังไม่มี ให้เว้นเป็นค่าว่างไว้ก่อน — ระบบจะแสดงข้อความแจ้งเตือนที่ชัดเจนแทนการค้างหน้าโหลด
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbwzx2priCtkXGy3UdVo0oEJiFes6oeQ6HO-Z9XT8qEeFyHE_ibVkjahXf6L-KktPEVN/exec';
 // =====================================================
-// 🤖 ระบบถาม-ตอบจากข้อมูลภายใน (ไม่ต้องใช้ API)
-// =====================================================
-const QA_DATABASE = [
-  // โรงพยาบาลรัฐ
-  {
-    keywords: ['รัฐ', 'ipd', 'ผู้ป่วยใน', 'นอน', 'admit', 'รับไว้', 'โรงพยาบาลรัฐ'],
-    q: 'รักษาผู้ป่วยในโรงพยาบาลรัฐ เบิกได้เท่าไหร่?',
-    a: `🏛️ <strong>ผู้ป่วยใน (IPD) โรงพยาบาลรัฐ</strong><br><br>
-✅ เบิกได้ตามจริง ไม่จำกัดวงเงิน<br>
-🛏️ ค่าห้องพัก: พนักงาน ≤ 1,500 บ./วัน | ครอบครัว ≤ 1,100 บ./วัน<br>
-👨‍👩‍👧 สิทธิ์: พนักงาน + พ่อ/แม่/คู่สมรส/บุตร<br>
-📅 สูงสุด 120 วัน/ปี/รหัสพนักงาน`
-  },
-  // โรงพยาบาลเอกชน IPD
-  {
-    keywords: ['เอกชน', 'private', 'วงเงิน', '113', 'เบิกได้เท่าไหร่', 'เบิกได้เท่าไร', 'เบิกเท่าไหร่'],
-    q: 'รักษาที่โรงพยาบาลเอกชน เบิกได้เท่าไหร่?',
-    a: `🏢 <strong>ผู้ป่วยใน (IPD) โรงพยาบาลเอกชน</strong><br><br>
-💰 วงเงินสูงสุด <strong>113,520 บาท/ปี</strong><br>
-📌 เบิกได้ครึ่งหนึ่งของรายการที่เบิกได้<br>
-🛏️ ค่าห้องพัก: พนักงาน ≤ 1,500 บ./วัน | ครอบครัว ≤ 1,100 บ./วัน<br>
-💊 ค่าเวชภัณฑ์/อวัยวะเทียม: เบิกตามกรมบัญชีกลาง`
-  },
-  // OPD เอกชน
-  {
-    keywords: ['opd', 'ผู้ป่วยนอก', 'ไม่นอน', 'คลินิก', 'นอกเวลา'],
-    q: 'ผู้ป่วยนอก โรงพยาบาลเอกชน เบิกได้ไหม?',
-    a: `🏥 <strong>ผู้ป่วยนอก (OPD) โรงพยาบาลเอกชน</strong><br><br>
-🚫 โดยทั่วไป <strong>เบิกไม่ได้</strong><br><br>
-✅ <strong>ยกเว้น เบิกได้เมื่อ:</strong><br>
-1️⃣ อุบัติเหตุ<br>
-2️⃣ ถูกทำร้ายร่างกาย<br>
-3️⃣ เข้า ICU / CCU<br>
-4️⃣ ผ่าตัดภายใน 24 ชั่วโมง`
-  },
-  // ทันตกรรม
-  {
-    keywords: ['ทันต', 'ฟัน', 'จัดฟัน', 'ถอนฟัน', 'อุดฟัน', 'ขูดหินปูน', 'รากฟัน', 'ฟันปลอม'],
-    q: 'ทันตกรรม เบิกอะไรได้บ้าง?',
-    a: `🦷 <strong>ทันตกรรม</strong><br><br>
-✅ <strong>เบิกได้:</strong> อุด · ถอน · ขูดหินปูน · รักษารากฟัน · ใส่ฟันปลอม<br>
-🚫 <strong>เบิกไม่ได้:</strong> จัดฟัน · ฟอกสีฟัน · ทำวีเนียร์<br><br>
-⚠️ ใช้ได้เฉพาะ<strong>โรงพยาบาลรัฐ</strong>เท่านั้น<br>
-👨‍👩‍👧 สิทธิ์: พนักงานและครอบครัว`
-  },
-  // เอกสาร
-  {
-    keywords: ['เอกสาร', 'ใช้อะไร', 'ต้องใช้', 'หลักฐาน', 'ยื่น', 'เบิก'],
-    q: 'เอกสารที่ต้องใช้ในการเบิกมีอะไรบ้าง?',
-    a: `📋 <strong>เอกสารพื้นฐาน (ทุกกรณี)</strong><br><br>
-📄 ใบเสร็จรับเงินตัวจริง + ลายเซ็น<br>
-🏥 ใบรับรองแพทย์ระบุการวินิจฉัยโรค<br>
-📝 รายละเอียดการเบิกค่ารักษา<br><br>
-📋 <strong>เพิ่มเติมสำหรับ รพ.เอกชน</strong><br><br>
-📜 ใบอนุญาตประกอบการสถานพยาบาล<br>
-👨‍⚕️ คำรับรองแพทย์<br>
-🚑 รพ.8 (กรณีอุบัติเหตุ/ฉุกเฉิน)<br><br>
-⏰ ยื่นภายใน <strong>1 ปี</strong> นับจากวันรับบริการ`
-  },
-  // ใบเสร็จหาย
-  {
-    keywords: ['ใบเสร็จหาย', 'หาย', 'สูญหาย', 'ไม่มีใบเสร็จ'],
-    q: 'ใบเสร็จหาย ทำอย่างไร?',
-    a: `🔍 <strong>กรณีใบเสร็จหาย</strong><br><br>
-1️⃣ แจ้งความที่สถานีตำรวจ<br>
-2️⃣ ขอสำเนาใบเสร็จจากโรงพยาบาล<br>
-3️⃣ ทำบันทึกข้อความรับรองเอกสาร + ลายเซ็น<br><br>
-📞 สอบถามเพิ่มเติม: <strong>02-269-5599</strong>`
-  },
-  // ยา
-  {
-    keywords: ['ยา', 'ยานอกบัญชี', 'บัญชียา', 'วัคซีน', 'อาหารเสริม'],
-    q: 'ยา เบิกได้อะไรบ้าง?',
-    a: `💊 <strong>การเบิกค่ายา</strong><br><br>
-✅ ยาในบัญชียาหลักแห่งชาติ: เบิกได้เต็มจำนวน<br>
-📋 ยานอกบัญชียาหลัก: ต้องมีใบรายการยา + หนังสือรับรองแพทย์ + หนังสือประกอบการเบิก<br>
-🚫 อาหารเสริม / เวชสำอาง: เบิกไม่ได้<br>
-💉 วัคซีน: เบิกได้เฉพาะมีคำรับรองแพทย์และมีความจำเป็น`
-  },
-  // ครอบครัว
-  {
-    keywords: ['ครอบครัว', 'พ่อ', 'แม่', 'ลูก', 'บุตร', 'สามี', 'ภรรยา', 'คู่สมรส', 'ใคร', 'สิทธิ์'],
-    q: 'ครอบครัวใครบ้างที่ใช้สิทธิ์ได้?',
-    a: `👨‍👩‍👧 <strong>ผู้มีสิทธิ์ใช้สวัสดิการ</strong><br><br>
-✅ ตัวพนักงาน<br>
-✅ บิดา (พ่อ)<br>
-✅ มารดา (แม่)<br>
-✅ คู่สมรส (สามี/ภรรยา)<br>
-✅ บุตรโดยชอบด้วยกฎหมาย<br>
-✅ บุตรบุญธรรมโดยชอบด้วยกฎหมาย<br><br>
-⚠️ พี่/น้อง หรือญาติอื่นๆ <strong>ไม่มีสิทธิ์</strong>`
-  },
-  // ผ่าตัดฉุกเฉิน
-  {
-    keywords: ['ผ่าตัด', 'ฉุกเฉิน', 'อุบัติเหตุ', 'ด่วน', 'icu', 'ccu'],
-    q: 'ผ่าตัดฉุกเฉินที่ รพ.เอกชน เบิกได้ไหม?',
-    a: `🚑 <strong>กรณีฉุกเฉิน/ผ่าตัด รพ.เอกชน</strong><br><br>
-✅ <strong>เบิกได้</strong> ในกรณีต่อไปนี้<br>
-1️⃣ อุบัติเหตุ<br>
-2️⃣ ถูกทำร้ายร่างกาย<br>
-3️⃣ เข้า ICU / CCU<br>
-4️⃣ ผ่าตัดภายใน 24 ชั่วโมง<br><br>
-📋 ต้องมีเอกสาร รพ.8 ประกอบการเบิกด้วยครับ`
-  },
-  // ระยะเวลา
-  {
-    keywords: ['ระยะเวลา', 'กี่วัน', 'กี่ปี', 'หมดอายุ', 'เกินกำหนด', 'นานแค่ไหน'],
-    q: 'ต้องยื่นเอกสารภายในกี่วัน?',
-    a: `⏰ <strong>ระยะเวลายื่นเอกสาร</strong><br><br>
-📅 ต้องยื่นภายใน <strong>1 ปี</strong> นับจากวันที่รับบริการ<br><br>
-⚠️ ถ้าเกินกำหนด 1 ปี จะหมดสิทธิ์เบิกทันที<br><br>
-📞 สอบถามเพิ่มเติม: <strong>02-269-5599</strong>`
-  }
-];
-
-function findAnswer(q) {
-  const input = q.toLowerCase();
-  // หาคำตอบที่ตรงกับ keyword มากที่สุด
-  let bestMatch = null;
-  let bestScore = 0;
-  for (const item of QA_DATABASE) {
-    const score = item.keywords.filter(k => input.includes(k.toLowerCase())).length;
-    if (score > bestScore) {
-      bestScore = score;
-      bestMatch = item;
-    }
-  }
-  if (bestScore > 0) return bestMatch.a;
-  return `ขออภัยครับ ไม่พบข้อมูลที่ตรงกับคำถามนี้<br><br>📞 กรุณาติดต่อเจ้าหน้าที่โดยตรง<br><strong>สำนักแพทย์ กทท. โทร 02-269-5599</strong>`;
-}
-// =====================================================
-
-// =====================================================
-// 🤖 AI CHATBOT
-// =====================================================
-const BENEFIT_CONTEXT = `
-คุณคือ AI ผู้ช่วยด้านสวัสดิการค่ารักษาพยาบาลของ "การท่าเรือแห่งประเทศไทย (กทท.)"
-ตอบคำถามตามระเบียบต่อไปนี้เท่านั้น อย่าตอบเรื่องอื่น:
-
-=== สิทธิ์รักษาพยาบาล (ระเบียบ กทท. 2547 อ้างอิงกรมบัญชีกลาง) ===
-
-[โรงพยาบาลรัฐ - ผู้ป่วยใน IPD]
-- เบิกได้ตามจริง ไม่จำกัดวงเงิน
-- ค่าห้องพัก: พนักงาน ≤ 1,500 บาท/วัน, ครอบครัว ≤ 1,100 บาท/วัน
-- สิทธิ์: พนักงานและครอบครัว (พ่อ/แม่/คู่สมรส/บุตร/บุตรบุญธรรมโดยชอบด้วยกฎหมาย)
-- จำกัด 120 วัน/ปี/รหัสพนักงาน
-
-[โรงพยาบาลรัฐ - ผู้ป่วยนอก OPD]
-- เบิกได้ตามจริง ครอบคลุมทั้งรพ.รัฐและเอกชน
-- สิทธิ์: พนักงานและครอบครัว
-
-[โรงพยาบาลเอกชน - ผู้ป่วยใน IPD]
-- เบิกได้ครึ่งหนึ่งของรายการที่เบิกได้ ภายในวงเงิน 113,520 บาท/ปี
-- ค่าเวชภัณฑ์/อวัยวะเทียม: เบิกตามกรมบัญชีกลาง
-- ค่าห้องพัก: พนักงาน ≤ 1,500 บาท/วัน, ครอบครัว ≤ 1,100 บาท/วัน
-
-[โรงพยาบาลเอกชน - ผู้ป่วยนอก OPD]
-- เบิกไม่ได้ โดยทั่วไป
-- ยกเว้น: 1) อุบัติเหตุ 2) ถูกทำร้ายร่างกาย 3) ICU/CCU 4) ผ่าตัดภายใน 24 ชม.
-- สิทธิ์: เฉพาะพนักงานเท่านั้น
-
-[ทันตกรรม]
-- เบิกได้: อุด ถอน ขูดหินปูน รักษารากฟัน ใส่ฟันปลอม
-- เบิกไม่ได้: จัดฟัน ฟอกสีฟัน ทำวีเนียร์
-- ใช้ได้เฉพาะโรงพยาบาลรัฐเท่านั้น
-- สิทธิ์: พนักงานและครอบครัว
-
-[ยา]
-- ยาในบัญชียาหลักแห่งชาติ: เบิกได้เต็มจำนวน
-- ยานอกบัญชียาหลัก: เบิกได้เมื่อมีใบรายการยา + หนังสือรับรองแพทย์ + หนังสือประกอบการเบิกกรณีจำเป็น
-- อาหารเสริม/เวชสำอาง: เบิกไม่ได้
-- วัคซีน: เบิกไม่ได้ ยกเว้นมีคำรับรองแพทย์และมีความจำเป็น
-
-[เอกสารพื้นฐาน]
-- ใบเสร็จรับเงินตัวจริง + ลายเซ็นผู้เบิก ทุกฉบับ
-- ใบรับรองแพทย์ระบุการวินิจฉัยโรค
-- รายละเอียดการเบิกค่ารักษา
-
-[เอกสารเพิ่มเติม รพ.เอกชน]
-- หนังสือใบอนุญาตประกอบการสถานพยาบาล
-- ใบอนุญาตให้ดำเนินการสถานพยาบาล
-- คำรับรองแพทย์/คำรับรองของผู้ดำเนินการสถานพยาบาล
-- รพ.8 (กรณีอุบัติเหตุ ฉุกเฉิน)
-
-[กรณีใบเสร็จหาย]
-- แจ้งความที่สถานีตำรวจ → ขอสำเนาใบเสร็จจากรพ. → ทำบันทึกข้อความรับรองเอกสาร + ลายเซ็น
-
-[ระยะเวลายื่นเอกสาร]
-- ต้องยื่นภายใน 1 ปี นับจากวันรับบริการ
-
-ตอบสั้น กระชับ เป็นภาษาไทย เป็นมิตร ใช้ bullet points เมื่อเหมาะสม
-ถ้าไม่มีข้อมูลในขอบเขตนี้ให้บอกว่า "กรุณาติดต่อเจ้าหน้าที่โดยตรง โทร 02-269-5599"
-`;
-
-let aiChatHistory = [];
-let aiIsLoading = false;
-
-// ==============================
-// Chat session storage (1 hour)
-// ==============================
-const CHAT_STORAGE_KEY = 'pat_ai_chat_session';
-const CHAT_TTL_MS = 60 * 60 * 1000; // 1 hour
-
-function saveChatSession() {
-  const session = {
-    history: aiChatHistory,
-    ts: Date.now()
-  };
-  try { sessionStorage.setItem(CHAT_STORAGE_KEY, JSON.stringify(session)); } catch(e) {}
-}
-
-function loadChatSession() {
-  try {
-    const raw = sessionStorage.getItem(CHAT_STORAGE_KEY);
-    if (!raw) return null;
-    const session = JSON.parse(raw);
-    if (Date.now() - session.ts > CHAT_TTL_MS) {
-      sessionStorage.removeItem(CHAT_STORAGE_KEY);
-      return null;
-    }
-    return session;
-  } catch(e) { return null; }
-}
-
-function initChatHistory() {
-  const session = loadChatSession();
-  const histPanel = document.getElementById('ai-history-panel');
-  const histList = document.getElementById('ai-history-list');
-
-  if (session && session.history.length > 0) {
-    aiChatHistory = session.history;
-    // Build history list entries (pairs)
-    const pairs = [];
-    for (let i = 0; i < session.history.length; i += 2) {
-      if (session.history[i] && session.history[i+1]) {
-        pairs.push({ q: session.history[i].content, a: session.history[i+1].content });
-      }
-    }
-    if (pairs.length > 0) {
-      histList.innerHTML = pairs.map((p, idx) => `
-        <div style="padding:8px 0;border-bottom:1px solid rgba(42,181,212,0.1);">
-          <div style="font-size:12px;font-weight:700;color:#2ab5d4;margin-bottom:2px;">🙋 ${p.q}</div>
-          <div style="font-size:11px;color:#4a6a7a;line-height:1.5;">${p.a.replace(/\n/g,'<br>').substring(0,120)}${p.a.length>120?'...':''}</div>
-        </div>`).join('');
-      histPanel.style.display = 'block';
-    }
-  }
-}
-
-function toggleHistory() {
-  const body = document.getElementById('ai-history-body');
-  const arrow = document.getElementById('ai-history-arrow');
-  const isOpen = body.style.display !== 'none';
-  body.style.display = isOpen ? 'none' : 'block';
-  arrow.textContent = isOpen ? '▶' : '▼';
-}
-
-function clearHistory() {
-  sessionStorage.removeItem(CHAT_STORAGE_KEY);
-  aiChatHistory = [];
-  document.getElementById('ai-history-panel').style.display = 'none';
-  document.getElementById('ai-history-list').innerHTML = '';
-}
-
-function setAIPrompt(text) {
-  document.getElementById('ai-input').value = text;
-  autoResize(document.getElementById('ai-input'));
-  sendAI();
-}
-
-function autoResize(el) {
-  el.style.height = 'auto';
-  el.style.height = Math.min(el.scrollHeight, 100) + 'px';
-}
-
-async function sendAI() {
-  if (aiIsLoading) return;
-  const input = document.getElementById('ai-input');
-  const q = input.value.trim();
-  if (!q) return;
-
-  input.value = '';
-  input.style.height = 'auto';
-  aiIsLoading = true;
-
-  const chatBox = document.getElementById('ai-chat-box');
-
-  // User bubble
-  const userDiv = document.createElement('div');
-  userDiv.className = 'ai-bubble-user';
-  userDiv.textContent = q;
-  chatBox.appendChild(userDiv);
-
-  // Typing indicator
-  const typingDiv = document.createElement('div');
-  typingDiv.className = 'ai-bubble-bot';
-  typingDiv.innerHTML = '<div class="ai-typing"><div class="ai-dot"></div><div class="ai-dot"></div><div class="ai-dot"></div></div>';
-  chatBox.appendChild(typingDiv);
-  chatBox.scrollTop = chatBox.scrollHeight;
-
-  aiChatHistory.push({ role: 'user', content: q });
-
-  try {
-    const answer = await callAI(BENEFIT_CONTEXT, aiChatHistory) || 'ขออภัย ไม่สามารถตอบได้ในขณะนี้';
-    aiChatHistory.push({ role: 'assistant', content: answer });
-
-    // Save session (1 hour TTL)
-    saveChatSession();
-
-    // Update history panel
-    const histPanel = document.getElementById('ai-history-panel');
-    const histList = document.getElementById('ai-history-list');
-    const pairs = [];
-    for (let i = 0; i < aiChatHistory.length; i += 2) {
-      if (aiChatHistory[i] && aiChatHistory[i+1]) {
-        pairs.push({ q: aiChatHistory[i].content, a: aiChatHistory[i+1].content });
-      }
-    }
-    histList.innerHTML = pairs.map(p => `
-      <div style="padding:8px 0;border-bottom:1px solid rgba(42,181,212,0.1);">
-        <div style="font-size:12px;font-weight:700;color:#2ab5d4;margin-bottom:2px;">🙋 ${p.q}</div>
-        <div style="font-size:11px;color:#4a6a7a;line-height:1.5;">${p.a.replace(/\n/g,'<br>').substring(0,120)}${p.a.length>120?'...':''}</div>
-      </div>`).join('');
-    histPanel.style.display = 'block';
-
-    typingDiv.innerHTML = '<div style="font-size:11px;font-weight:700;color:#2ab5d4;margin-bottom:6px;">🤖 PAT AI Assistant</div>' + answer.replace(/\n/g, '<br>');
-  } catch(e) {
-    typingDiv.innerHTML = '<div style="color:#d93025;">⚠️ เกิดข้อผิดพลาด กรุณาลองใหม่อีกครั้ง</div>';
-  }
-
-  aiIsLoading = false;
-  chatBox.scrollTop = chatBox.scrollHeight;
-}
-
-document.addEventListener('keydown', function(e) {
-  if (e.key === 'Enter' && !e.shiftKey && document.activeElement.id === 'ai-input') {
-    e.preventDefault();
-    sendAI();
-  }
-});
-
-// Init chat history on page load
-initChatHistory();
 
 // =====================================================
 // 🏥 HOSPITAL SEARCH — ฐานข้อมูลกระทรวงสาธารณสุข
@@ -1948,9 +1613,6 @@ function renderHospitals(q) {
   }).join('');
 }
 
-// Init hospital list on screen load — patch goTo
-const _origGoTo = goTo;
-
 // =====================================================
 // Sub-tab switcher for screen-check
 // =====================================================
@@ -1963,11 +1625,20 @@ function switchCheckTab(tab) {
 
 
 let drugsLoaded = false;
+let allDrugs = [];
 
 function loadDrugs() {
   document.getElementById('drug-loading').style.display = 'block';
   document.getElementById('drug-table-wrap').style.display = 'none';
   document.getElementById('drug-error').style.display = 'none';
+
+  // ยังไม่ได้ตั้งค่า URL ของ Google Apps Script — แจ้งให้ทราบชัดๆ แทนการค้างหน้าโหลดเฉยๆ
+  if (!SHEET_URL) {
+    document.getElementById('drug-loading').style.display = 'none';
+    document.getElementById('drug-error-msg').innerHTML = 'ยังไม่ได้ตั้งค่า URL ของ Google Apps Script ในโค้ด (ตัวแปร SHEET_URL ว่างอยู่)<br>กรุณาติดต่อผู้พัฒนาเพื่อใส่ URL';
+    document.getElementById('drug-error').style.display = 'block';
+    return;
+  }
 
   // ใช้ JSONP เพื่อข้าม CORS
   window.drugCallback = function(raw) {
@@ -1983,6 +1654,7 @@ function loadDrugs() {
       document.getElementById('drug-hint').style.display = 'block';
     } catch(e) {
       document.getElementById('drug-loading').style.display = 'none';
+      document.getElementById('drug-error-msg').innerHTML = 'รูปแบบข้อมูลที่ได้รับไม่ถูกต้อง<br>กรุณาตรวจสอบโครงสร้างข้อมูลใน Google Sheet';
       document.getElementById('drug-error').style.display = 'block';
     }
   };
@@ -1994,6 +1666,7 @@ function loadDrugs() {
   s.id = 'jsonp-script';
   s.onerror = function() {
     document.getElementById('drug-loading').style.display = 'none';
+    document.getElementById('drug-error-msg').innerHTML = 'เชื่อมต่อ Google Sheet ไม่ได้<br>กรุณาตรวจสอบ URL หรือการเชื่อมต่ออินเทอร์เน็ต';
     document.getElementById('drug-error').style.display = 'block';
   };
   s.src = SHEET_URL + '?callback=drugCallback';
@@ -2003,6 +1676,7 @@ function loadDrugs() {
   setTimeout(function(){
     if (!drugsLoaded) {
       document.getElementById('drug-loading').style.display = 'none';
+      document.getElementById('drug-error-msg').innerHTML = 'โหลดข้อมูลใช้เวลานานเกินไป (เกิน 10 วินาที)<br>กรุณาตรวจสอบ URL ของ Google Sheet หรือการตั้งค่า Apps Script';
       document.getElementById('drug-error').style.display = 'block';
     }
   }, 10000);
@@ -2354,7 +2028,8 @@ function declinePDPA() {
   document.getElementById('pdpa-declined-bar').style.display = 'flex';
 }
 
-checkPDPA();</script>
+// เรียกหลัง DOM โหลดครบ เพราะ #pdpa-modal อยู่ใน HTML หลัง <script> นี้
+document.addEventListener('DOMContentLoaded', checkPDPA);</script>
 <!-- ============ PDPA MODAL ============ -->
 <div id="pdpa-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:flex-end;justify-content:center;">
   <div style="background:white;border-radius:24px 24px 0 0;padding:28px 22px 36px;max-width:480px;width:100%;box-shadow:0 -8px 40px rgba(0,0,0,0.18);">
