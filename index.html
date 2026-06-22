@@ -1908,9 +1908,19 @@ function renderEquipTable(items) {
   const q = document.getElementById('equip-input').value.trim();
 
   const filterLabel = equipFilter === 'ipd' ? ' (ผู้ป่วยใน)' : equipFilter === 'opd' ? ' (ผู้ป่วยนอก)' : '';
-  label.textContent = q
-    ? `🔍 ผลการค้นหา${filterLabel} (${items.length} รายการ)`
-    : `🩺 รายการอุปกรณ์${filterLabel} (${items.length} รายการ)`;
+
+  // ถ้ายังไม่ได้พิมพ์ค้นหา → แสดงแค่จำนวน ไม่แสดงรายการ
+  if (!q) {
+    label.innerHTML = `🩺 รายการอุปกรณ์${filterLabel} ทั้งหมด <span style="font-weight:800;color:#2ab5d4;">${items.length} รายการ</span><br><span style="font-size:11px;font-weight:500;color:#6b8a9a;">💡 พิมพ์ชื่อหรือรหัสอุปกรณ์เพื่อค้นหา</span>`;
+    table.innerHTML = '';
+    table.style.display = 'none';
+    wrap.style.display = 'block';
+    return;
+  }
+  table.style.display = '';
+
+  // มีคำค้นหา → แสดงผลลัพธ์
+  label.textContent = `🔍 ผลการค้นหา${filterLabel} (${items.length} รายการ)`;
 
   if (!items.length) {
     table.innerHTML = '<div style="text-align:center;padding:20px;color:#aaa;font-size:13px;">ไม่พบรายการที่ค้นหา</div>';
@@ -1977,11 +1987,31 @@ function resetHospitalScreen() {
   renderHospitals(''); // แสดงรายการ กทม. + ปริมณฑล ทันที
 }
 
+// รีเซ็ตหน้าต่างๆ ให้กลับสู่สถานะเริ่มต้น
+function resetScreen(id) {
+  if (id === 'screen-hospital') {
+    resetHospitalScreen();
+  }
+  if (id === 'screen-check') {
+    // รีเซ็ต tab กลับไปที่ยา และล้างค้นหา
+    switchCheckTab('drug');
+    clearDrug();
+    clearEquip();
+  }
+  if (id === 'screen-docs') {
+    // รีเซ็ต checklist ทั้งหมด
+    resetCheck();
+  }
+  if (id === 'screen-ai') {
+    // ไม่ล้างแชท — แค่ render ประวัติใหม่
+    renderAIChatFromHistory();
+  }
+}
+
 function goBack() {
   const cur = document.querySelector('.screen.active');
   if (cur) {
-    // ล้างข้อมูลค้นหาโรงพยาบาลเมื่อกดย้อนกลับ
-    if (cur.id === 'screen-hospital') resetHospitalScreen();
+    resetScreen(cur.id);
     cur.classList.remove('active');
   }
   const prev = history.pop() || 'screen-home';
@@ -1994,7 +2024,7 @@ function goBack() {
 window.addEventListener('popstate', function(e) {
   const cur = document.querySelector('.screen.active');
   if (cur && cur.id !== 'screen-home') {
-    if (cur.id === 'screen-hospital') resetHospitalScreen();
+    resetScreen(cur.id);
     cur.classList.remove('active');
     const prev = history.pop() || 'screen-home';
     document.getElementById(prev).classList.add('active');
@@ -2079,7 +2109,7 @@ function askAI(text) {
   sendAI();
 }
 
-// ===== AI Chat History (localStorage + 1 ชั่วโมง) =====
+// ===== AI Chat History (localStorage + 1 ชั่วโมงต่อข้อความ) =====
 const AI_HISTORY_KEY = 'pat_ai_chat_history';
 const AI_HISTORY_TTL = 60 * 60 * 1000; // 1 ชั่วโมง (ms)
 
@@ -2087,19 +2117,26 @@ function getAIChatHistory() {
   try {
     const raw = localStorage.getItem(AI_HISTORY_KEY);
     if (!raw) return [];
-    const data = JSON.parse(raw);
-    // ตรวจหมดอายุ
-    if (Date.now() - (data.savedAt || 0) > AI_HISTORY_TTL) {
-      localStorage.removeItem(AI_HISTORY_KEY);
-      return [];
+    const msgs = JSON.parse(raw);
+    if (!Array.isArray(msgs)) return [];
+    // กรองเฉพาะข้อความที่ยังไม่หมดอายุ (ภายใน 1 ชม. นับจากเวลาถามแต่ละข้อ)
+    const now = Date.now();
+    const valid = msgs.filter(function(m) {
+      return m.sentAt && (now - m.sentAt) < AI_HISTORY_TTL;
+    });
+    // ถ้ามีข้อความหมดอายุ ให้อัปเดต localStorage ด้วย
+    if (valid.length !== msgs.length) {
+      if (valid.length === 0) localStorage.removeItem(AI_HISTORY_KEY);
+      else localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(valid));
     }
-    return data.msgs || [];
+    return valid;
   } catch(e) { return []; }
 }
 
 function saveAIChatHistory(msgs) {
   try {
-    localStorage.setItem(AI_HISTORY_KEY, JSON.stringify({ msgs: msgs, savedAt: Date.now() }));
+    if (!msgs.length) { localStorage.removeItem(AI_HISTORY_KEY); return; }
+    localStorage.setItem(AI_HISTORY_KEY, JSON.stringify(msgs));
   } catch(e) {}
 }
 
@@ -2154,9 +2191,9 @@ function sendAI() {
 
   const answer = findAIAnswer(q);
 
-  // บันทึกประวัติลง sessionStorage
+  // บันทึกประวัติลง localStorage พร้อม timestamp ต่อข้อความ
   const msgs = getAIChatHistory();
-  msgs.push({ q: q, a: answer });
+  msgs.push({ q: q, a: answer, sentAt: Date.now() });
   saveAIChatHistory(msgs);
 
   // User bubble
