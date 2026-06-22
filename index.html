@@ -1941,7 +1941,7 @@ function renderEquipTable(items) {
       ${d.code ? `<div style="font-size:11px;color:#6b8a9a;">รหัส: ${d.code}${d.item ? ' · ลำดับ ' + d.item : ''}${d.unit ? ' · หน่วย: ' + d.unit : ''}</div>` : ''}
       ${d.maxRate ? `<div style="font-size:11px;color:#1a8fa8;margin-top:2px;">💰 อัตราเบิกสูงสุด: <strong>${d.maxRate} บาท</strong></div>` : ''}
       ${d.indication ? `<div style="font-size:11px;color:#4a6a7a;margin-top:3px;line-height:1.5;">📋 ${d.indication}</div>` : ''}
-      ${d.remark ? `<div style="font-size:11px;color:#888;margin-top:2px;font-style:italic;">* ${d.remark}</div>` : ''}
+      ${d.remark ? `<div style="font-size:11px;color:#d93025;margin-top:2px;font-style:italic;">* ${d.remark}</div>` : ''}
     </div>`;
   }).join('');
 
