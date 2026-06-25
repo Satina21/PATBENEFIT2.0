@@ -585,7 +585,7 @@ html, body {
     <div class="header-icons">
       <div class="hex-icon">🩺</div>
       <div class="hex-icon">💉</div>
-      <div class="header-center-icon">🏥</div>
+      <div class="header-center-icon" id="secret-trigger" onclick="secretTap()">🏥</div>
       <div class="hex-icon">💊</div>
       <div class="hex-icon">🩻</div>
     </div>
@@ -1959,6 +1959,10 @@ function goTo(id) {
   document.getElementById(id).classList.add('active');
   window.scrollTo(0, 0);
   window.history.pushState({ screen: id }, '');
+  // บันทึกสถิติ
+  trackScreen(id);
+  // render สถิติเมื่อเปิดหน้า About
+  if (id === 'screen-about') renderStats();
   // โหลดรายการยาครั้งแรกเมื่อเปิดหน้าตรวจสอบยา
   if (id === 'screen-check' && !drugsLoaded) {
     loadDrugs();
@@ -2251,8 +2255,197 @@ function acceptPDPA() {
   document.getElementById('pdpa-modal').style.display = 'none';
 }
 
+// =====================================================
+// 📊 STATS — เก็บสถิติการใช้งาน (ไม่มีข้อมูลส่วนบุคคล)
+// =====================================================
+const STATS_KEY = 'pat_usage_stats';
+
+const SCREEN_LABELS = {
+  'screen-rights':   { label: 'สิทธิการรักษา',        icon: '🩺' },
+  'screen-steps':    { label: 'ขั้นตอนเบิก',           icon: '🏥' },
+  'screen-docs':     { label: 'เอกสารที่ต้องใช้',      icon: '📋' },
+  'screen-check':    { label: 'ค้นหารายการเบิกจ่าย',   icon: '💊' },
+  'screen-faq':      { label: 'FAQ',                   icon: '❓' },
+  'screen-contact':  { label: 'ติดต่อเจ้าหน้าที่',    icon: '📞' },
+  'screen-ai':       { label: 'AI ถาม-ตอบ',            icon: '🤖' },
+  'screen-hospital': { label: 'ค้นหาโรงพยาบาล',       icon: '🗺️' },
+};
+
+function getStats() {
+  try {
+    const raw = localStorage.getItem(STATS_KEY);
+    return raw ? JSON.parse(raw) : { sessions: 0, screens: {}, firstUse: null, lastUse: null };
+  } catch(e) { return { sessions: 0, screens: {}, firstUse: null, lastUse: null }; }
+}
+
+function saveStats(s) {
+  try { localStorage.setItem(STATS_KEY, JSON.stringify(s)); } catch(e) {}
+}
+
+function trackScreen(id) {
+  if (!SCREEN_LABELS[id]) return;
+  const s = getStats();
+  s.screens[id] = (s.screens[id] || 0) + 1;
+  s.lastUse = new Date().toISOString();
+  if (!s.firstUse) s.firstUse = s.lastUse;
+  saveStats(s);
+}
+
+function trackSession() {
+  const s = getStats();
+  s.sessions = (s.sessions || 0) + 1;
+  s.lastUse = new Date().toISOString();
+  if (!s.firstUse) s.firstUse = s.lastUse;
+  saveStats(s);
+}
+
+function clearStats() {
+  localStorage.removeItem(STATS_KEY);
+  renderStats();
+}
+
+function renderStats() {
+  const s = getStats();
+  const body = document.getElementById('stats-body');
+  if (!body) return;
+
+  const total = Object.values(s.screens).reduce((a, b) => a + b, 0);
+  const sorted = Object.entries(s.screens)
+    .sort((a, b) => b[1] - a[1]);
+  const maxVal = sorted.length ? sorted[0][1] : 1;
+
+  const fmt = iso => iso ? new Date(iso).toLocaleDateString('th-TH', { day:'numeric', month:'short', year:'2-digit', hour:'2-digit', minute:'2-digit' }) : '-';
+
+  let html = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px;">
+      <div style="background:rgba(42,181,212,0.08);border-radius:12px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:800;color:#1a8fa8;">${s.sessions}</div>
+        <div style="font-size:10px;color:#6b8a9a;margin-top:2px;">ครั้งที่เปิดใช้</div>
+      </div>
+      <div style="background:rgba(60,170,126,0.08);border-radius:12px;padding:10px;text-align:center;">
+        <div style="font-size:20px;font-weight:800;color:#3caa7e;">${total}</div>
+        <div style="font-size:10px;color:#6b8a9a;margin-top:2px;">การกดเมนูทั้งหมด</div>
+      </div>
+    </div>
+    <div style="font-size:11px;color:#6b8a9a;margin-bottom:10px;">ใช้ครั้งแรก: ${fmt(s.firstUse)} &nbsp;·&nbsp; ล่าสุด: ${fmt(s.lastUse)}</div>
+  `;
+
+  if (!sorted.length) {
+    html += `<div style="font-size:12px;color:#aaa;text-align:center;padding:8px 0;">ยังไม่มีข้อมูล</div>`;
+  } else {
+    html += `<div style="font-size:11px;font-weight:700;color:#6b8a9a;margin-bottom:8px;text-transform:uppercase;letter-spacing:0.05em;">เมนูที่ใช้บ่อย</div>`;
+    sorted.forEach(([id, count]) => {
+      const info = SCREEN_LABELS[id] || { label: id, icon: '📌' };
+      const pct = Math.round((count / maxVal) * 100);
+      html += `
+        <div style="margin-bottom:10px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+            <div style="font-size:12px;color:#2a4a5a;font-weight:600;">${info.icon} ${info.label}</div>
+            <div style="font-size:11px;color:#1a8fa8;font-weight:700;">${count} ครั้ง</div>
+          </div>
+          <div style="height:6px;background:rgba(42,181,212,0.12);border-radius:3px;overflow:hidden;">
+            <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#2ab5d4,#5dcbe8);border-radius:3px;transition:width 0.4s;"></div>
+          </div>
+        </div>
+      `;
+    });
+  }
+
+  body.innerHTML = html;
+}
+
+// =====================================================
+// 🤫 SECRET TRIGGER — กดไอคอน 🏥 กลาง 5 ครั้ง
+// =====================================================
+let secretTapCount = 0;
+let secretTapTimer = null;
+
+function secretTap() {
+  secretTapCount++;
+  clearTimeout(secretTapTimer);
+  if (secretTapCount >= 5) {
+    secretTapCount = 0;
+    goTo('screen-about');
+    return;
+  }
+  secretTapTimer = setTimeout(() => { secretTapCount = 0; }, 2000);
+}
+
 // เรียกหลัง DOM โหลดครบ
-document.addEventListener('DOMContentLoaded', checkPDPA);</script>
+document.addEventListener('DOMContentLoaded', function() {
+  checkPDPA();
+  trackSession();
+});</script>
+
+<!-- ============ ABOUT SCREEN ============ -->
+<div id="screen-about" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">ℹ️ เกี่ยวกับแอปนี้</div>
+    </div>
+    <div class="content-area">
+
+      <!-- App Info (ทุกคนเห็น) -->
+      <div class="content-card">
+        <div class="content-card-title">📱 ข้อมูลแอปพลิเคชัน</div>
+        <div class="doc-row">
+          <div class="doc-row-label">ชื่อแอป</div>
+          <div class="doc-row-val" style="font-weight:600;">PAT Benefit Service</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-row-label">เวอร์ชัน</div>
+          <div class="doc-row-val">5.0</div>
+        </div>
+        <div class="doc-row">
+          <div class="doc-row-label">วัตถุประสงค์</div>
+          <div class="doc-row-val">ระบบสืบค้นข้อมูลการเบิกจ่ายค่ารักษาพยาบาล การท่าเรือแห่งประเทศไทย</div>
+        </div>
+        <div class="doc-row" style="border-bottom:none;">
+          <div class="doc-row-label">แพลตฟอร์ม</div>
+          <div class="doc-row-val">Web App (Mobile-First)</div>
+        </div>
+      </div>
+
+      <!-- Features (ทุกคนเห็น) -->
+      <div class="content-card">
+        <div class="content-card-title">✨ ฟีเจอร์หลัก</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+            <div style="width:32px;height:32px;border-radius:10px;background:rgba(60,170,126,0.15);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🩺</div>
+            <div style="font-size:13px;color:#2a4a5a;">ข้อมูลสิทธิการรักษาพยาบาลครบถ้วน</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+            <div style="width:32px;height:32px;border-radius:10px;background:rgba(42,181,212,0.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🤖</div>
+            <div style="font-size:13px;color:#2a4a5a;">AI ถาม-ตอบสวัสดิการอัจฉริยะ</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+            <div style="width:32px;height:32px;border-radius:10px;background:rgba(245,166,35,0.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">💊</div>
+            <div style="font-size:13px;color:#2a4a5a;">ค้นหารายการยาเบิกจ่าย</div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:6px 0;">
+            <div style="width:32px;height:32px;border-radius:10px;background:rgba(124,111,224,0.12);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏥</div>
+            <div style="font-size:13px;color:#2a4a5a;">ค้นหาโรงพยาบาลและแผนที่</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Card (เข้าได้จาก secret trigger เท่านั้น) -->
+      <div class="content-card" id="stats-card">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+          <div class="content-card-title" style="margin-bottom:0;">📊 สถิติการใช้งาน</div>
+        </div>
+        <div id="stats-body">
+          <div style="font-size:12px;color:#6b8a9a;padding:8px 0;">กำลังโหลด...</div>
+        </div>
+        <button onclick="clearStats()" style="margin-top:12px;width:100%;padding:9px;border-radius:10px;background:rgba(224,90,90,0.08);border:1.5px dashed rgba(224,90,90,0.3);color:#e05a5a;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--font);">🗑 รีเซ็ตสถิติ</button>
+      </div>
+
+      <div style="padding-bottom:30px;"></div>
+
+    </div>
+  </div>
+</div>
 
 <!-- ============ PDPA MODAL ============ -->
 <div id="pdpa-modal" style="display:none;position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.55);align-items:flex-end;justify-content:center;">
