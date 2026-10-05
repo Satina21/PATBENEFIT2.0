@@ -562,6 +562,79 @@ html, body {
   gap: 12px;
   box-shadow: 0 2px 10px rgba(42,181,212,0.08);
 }
+
+/* === MOU HOSPITALS === */
+.mou-banner {
+  position: relative; z-index: 10; flex-shrink: 0;
+  margin: 0 14px 12px; padding: 10px 14px;
+  display: flex; align-items: center; gap: 12px;
+  background: linear-gradient(135deg, #2ab5d4, #1a8fa8);
+  border-radius: 16px; color: #fff; cursor: pointer;
+  box-shadow: 0 6px 18px rgba(42,181,212,0.35);
+  transition: transform 0.18s ease;
+}
+.mou-banner:active { transform: scale(0.97); }
+.mou-banner-icon {
+  width: 38px; height: 38px; border-radius: 12px; flex-shrink: 0;
+  background: rgba(255,255,255,0.25); display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.mou-banner-text { flex: 1; min-width: 0; }
+.mou-banner-title { font-size: 14px; font-weight: 800; line-height: 1.2; }
+.mou-banner-sub { font-size: 11px; opacity: 0.9; margin-top: 2px; }
+.mou-banner-arrow { font-size: 20px; font-weight: 700; flex-shrink: 0; }
+.mou-count { background: #fff; color: #1a8fa8; font-size: 11px; font-weight: 800; padding: 2px 8px; border-radius: 20px; margin-left: 6px; }
+
+.mou-card {
+  background: rgba(255,255,255,0.8); border: 1.5px solid rgba(255,255,255,0.9);
+  border-radius: 16px; margin-bottom: 10px; overflow: hidden;
+  box-shadow: 0 2px 10px rgba(42,181,212,0.08);
+}
+.mou-card-head { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+.mou-card-name { font-size: 13px; font-weight: 700; color: #1a3a4a; line-height: 1.3; }
+.mou-card-area { font-size: 11px; color: #6b8a9a; margin-top: 2px; }
+.mou-badge { font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; background: #2ab5d4; color: #fff; white-space: nowrap; flex-shrink: 0; }
+.mou-arrow { color: #6b8a9a; font-size: 16px; transition: transform 0.2s; flex-shrink: 0; }
+.mou-card.open .mou-arrow { transform: rotate(180deg); }
+.mou-card-body { display: none; padding: 0 16px 14px; border-top: 1px dashed rgba(42,181,212,0.3); }
+.mou-card.open .mou-card-body { display: block; }
+.mou-row { display: flex; gap: 8px; margin-top: 10px; font-size: 12px; line-height: 1.5; color: #1a3a4a; }
+.mou-row-label { flex-shrink: 0; width: 92px; font-weight: 700; color: #1a8fa8; }
+.mou-actions { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+.mou-btn {
+  flex: 1; min-width: 110px; text-align: center; text-decoration: none;
+  padding: 9px 12px; border-radius: 12px; font-size: 12px; font-weight: 700; font-family: var(--font);
+  background: linear-gradient(135deg,#2ab5d4,#1a8fa8); color: #fff;
+}
+.mou-btn.alt { background: rgba(42,181,212,0.12); color: #1a8fa8; }
+.mou-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 8px; margin-bottom: 8px; }
+.mou-chips .htab { white-space: nowrap; flex-shrink: 0; }
+
+.mou-group-head {
+  display: flex; align-items: center; gap: 10px;
+  margin: 18px 0 10px; padding: 10px 14px; border-radius: 14px;
+  color: #fff; font-weight: 800; font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+}
+.mou-group-head:first-child { margin-top: 4px; }
+.mou-group-head .g-ico { font-size: 20px; }
+.mou-group-head .g-sub { font-size: 11px; font-weight: 500; opacity: 0.92; margin-top: 1px; }
+.mou-group-head .g-count { margin-left: auto; background: rgba(255,255,255,0.25); padding: 3px 10px; border-radius: 20px; font-size: 12px; white-space: nowrap; }
+.mou-card { border-left: 5px solid var(--g, #2ab5d4); }
+.mou-badge { background: var(--g, #2ab5d4); }
+.mou-row-label { color: var(--g, #1a8fa8); }
+.mou-btn { background: var(--g, #2ab5d4); }
+.mou-btn.alt { background: rgba(0,0,0,0.06); color: #1a3a4a; }
+.mou-seg { display: flex; gap: 8px; margin-bottom: 8px; }
+.mou-seg .htab { flex: 1; padding: 9px 6px; text-align: center; white-space: nowrap; }
+.mou-seg .htab-active { background: var(--g, linear-gradient(135deg,#2ab5d4,#1a8fa8)); }
+
+.menu-sub { font-size: clamp(8.5px, 1.5vh, 10px); color: rgba(26,58,74,0.55); font-weight: 500; line-height: 1.1; text-align: center; }
+@media (max-height: 600px) { .menu-sub { display: none; } }
+.mou-howto { background: rgba(255,255,255,0.85); border: 1.5px solid rgba(42,181,212,0.25); border-radius: 16px; padding: 14px 16px; margin-bottom: 12px; }
+.mou-howto-title { font-size: 13px; font-weight: 800; color: #1a3a4a; margin-bottom: 10px; }
+.mou-step { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: #1a3a4a; line-height: 1.5; margin-bottom: 8px; }
+.mou-step-no { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg,#2ab5d4,#1a8fa8); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
+.mou-note { margin-top: 4px; padding: 10px 14px; background: rgba(217,48,37,0.08); border-left: 3px solid #d93025; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -602,45 +675,54 @@ html, body {
 
       <div class="menu-card card-green" onclick="goTo('screen-rights')">
         <div class="menu-icon-wrap bg-green">🩺</div>
-        <div class="menu-label">สิทธิการรักษา</div>
+        <div class="menu-label">สิทธิการรักษา</div><div class="menu-sub">เบิกได้เท่าไร</div>
       </div>
 
       <div class="menu-card card-red" onclick="goTo('screen-steps')">
-        <div class="menu-icon-wrap bg-red">🏥</div>
-        <div class="menu-label">ขั้นตอนเบิก</div>
+        <div class="menu-icon-wrap bg-red">📝</div>
+        <div class="menu-label">ขั้นตอนเบิก</div><div class="menu-sub">เบิกอย่างไร</div>
       </div>
 
       <div class="menu-card card-teal2" onclick="goTo('screen-docs')">
         <div class="menu-icon-wrap bg-teal">📋</div>
-        <div class="menu-label">เอกสารที่ต้องใช้</div>
+        <div class="menu-label">เอกสารที่ต้องใช้</div><div class="menu-sub">เตรียมอะไรบ้าง</div>
       </div>
 
       <div class="menu-card card-orange" onclick="goTo('screen-check')">
-        <div class="menu-icon-wrap bg-orange">📋</div>
-        <div class="menu-label">ค้นหารายการเบิกจ่าย</div>
+        <div class="menu-icon-wrap bg-orange">🔍</div>
+        <div class="menu-label">ค้นหารายการเบิกจ่าย</div><div class="menu-sub">ยา · อุปกรณ์</div>
       </div>
 
       <div class="menu-card card-purple" onclick="goTo('screen-faq')">
         <div class="menu-icon-wrap bg-purple">❓</div>
-        <div class="menu-label">FAQ</div>
+        <div class="menu-label">FAQ</div><div class="menu-sub">คำถามที่พบบ่อย</div>
       </div>
 
       <div class="menu-card card-blue" onclick="goTo('screen-contact')">
         <div class="menu-icon-wrap bg-pink">📞</div>
-        <div class="menu-label">ติดต่อเจ้าหน้าที่</div>
+        <div class="menu-label">ติดต่อเจ้าหน้าที่</div><div class="menu-sub">โทร · อีเมล</div>
       </div>
 
       <div class="menu-card card-purple" onclick="goTo('screen-ai')">
         <div class="menu-icon-wrap bg-purple">🤖</div>
-        <div class="menu-label">AI ถาม-ตอบสวัสดิการ</div>
+        <div class="menu-label">AI ถาม-ตอบ</div><div class="menu-sub">ถามเรื่องสวัสดิการ</div>
       </div>
 
       <div class="menu-card card-green" onclick="goTo('screen-hospital')">
         <div class="menu-icon-wrap bg-green">🏥</div>
-        <div class="menu-label">ค้นหาโรงพยาบาล</div>
+        <div class="menu-label">ค้นหาโรงพยาบาล</div><div class="menu-sub">ทั่วประเทศ</div>
       </div>
 
     </div>
+  </div>
+
+  <div class="mou-banner" onclick="goTo('screen-mou')">
+    <div class="mou-banner-icon">🤝</div>
+    <div class="mou-banner-text">
+      <div class="mou-banner-title">รพ.คู่สัญญา MOU <span class="mou-count" id="mou-count">0</span></div>
+      <div class="mou-banner-sub">ยื่นบัตรประชาชนได้เลย ไม่ต้องเตรียมเอกสาร</div>
+    </div>
+    <div class="mou-banner-arrow">›</div>
   </div>
 </div>
 
@@ -1156,6 +1238,9 @@ html, body {
     </div>
     <div class="content-area">
       <div class="tip-box">💡 แตะที่คำถามเพื่อดูคำตอบ</div>
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🤝</span>ไปใช้บริการ รพ. MOU ต้องทำอย่างไร?<span class="faq-arrow">⌄</span></div><div class="faq-a">1️⃣ <b>ยื่นบัตรประชาชน</b> ตอนเข้าใช้บริการได้เลย<br>2️⃣ รับการรักษาตามปกติ <b>ไม่ต้องนำเอกสารใดกลับมา</b><br>3️⃣ โรงพยาบาลจะ <b>ส่งเอกสารมาที่ กทท. เอง</b><br><br>⚠️ <b>หมายเหตุ:</b> บางรายการอาจเบิกไม่ได้ ต้อง<b>ชำระเงินเองที่โรงพยาบาล</b>ในส่วนนั้น<br><br><button onclick="goTo('screen-mou')" style="background:linear-gradient(135deg,#2ab5d4,#1a8fa8);color:#fff;border:none;border-radius:12px;padding:9px 16px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;">🤝 ดูรายชื่อ รพ. MOU</button></div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🏥</span>รพ. MOU มีที่ไหนบ้าง?<span class="faq-arrow">⌄</span></div><div class="faq-a" id="faq-mou-list"></div></div>
+
 
       <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🧾</span>ใบเสร็จหายต้องทำอย่างไร?<span class="faq-arrow">⌄</span></div><div class="faq-a"> กรณี ใบเสร็จรับเงินค่ารักษาพยาบาลฉบับจริงสูญหาย ผู้มีสิทธิต้องดำเนินการแจ้งความ ณ สถานีตำรวจ เพื่อขอเอกสารใบแจ้งความ จากนั้นนำใบแจ้งความติดต่อโรงพยาบาลเพื่อขอคัดสำเนาใบเสร็จรับเงินแทนฉบับจริง เมื่อได้รับสำเนาใบเสร็จรับเงินแล้ว ผู้มีสิทธิต้องจัดทำบันทึกข้อความรับรองเอกสาร พร้อมลงลายมือชื่อรับรองสำเนาถูกต้อง เพื่อประกอบการเบิกจ่ายค่ารักษาพยาบาลผ่านระบบ HRIS ต่อไป </div></div>
 
@@ -1238,6 +1323,7 @@ html, body {
       <div style="margin-bottom:12px;">
         <div style="font-size:11px;font-weight:700;color:#6b8a9a;margin-bottom:8px;">💬 คำถามยอดนิยม</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          <button onclick="askAI('รพ. MOU มีที่ไหนบ้าง ใช้สิทธิ์ยังไง?')" class="quick-chip" style="background:rgba(42,181,212,0.18);border-color:#2ab5d4;">🤝 รพ. MOU มีที่ไหนบ้าง?</button>
           <button onclick="askAI('รักษาที่ รพ.เอกชน เบิกได้เท่าไหร่?')" class="quick-chip">รพ.เอกชน เบิกได้เท่าไหร่?</button>
           <button onclick="askAI('เอกสารที่ต้องใช้ในการเบิกมีอะไรบ้าง?')" class="quick-chip">เอกสารที่ต้องใช้?</button>
           <button onclick="askAI('ผ่าตัดฉุกเฉินที่ รพ.เอกชน เบิกได้ไหม?')" class="quick-chip">ผ่าตัดฉุกเฉิน เบิกได้ไหม?</button>
@@ -1265,6 +1351,35 @@ html, body {
         สวัสดีครับ! ถามเรื่อง<strong>สิทธิ์การรักษา · วงเงิน · เอกสาร · ขั้นตอนการเบิก</strong>ได้เลยครับ 😊
       </div>
 
+    </div>
+  </div>
+</div>
+
+<!-- ============ MOU HOSPITAL SCREEN ============ -->
+<div id="screen-mou" class="screen">
+  <div class="inner-screen">
+    <div class="top-bar">
+      <div class="back-btn" onclick="goBack()">←</div>
+      <div class="top-bar-title">🤝 โรงพยาบาลคู่สัญญา MOU</div>
+    </div>
+    <div class="content-area">
+      <div class="mou-howto">
+        <div class="mou-howto-title">📌 วิธีใช้บริการ รพ. คู่สัญญา MOU</div>
+        <div class="mou-step"><div class="mou-step-no">1</div><div><b>ยื่นบัตรประชาชน</b> ตอนเข้าใช้บริการได้เลย</div></div>
+        <div class="mou-step"><div class="mou-step-no">2</div><div>รับการรักษาตามปกติ เมื่อเสร็จแล้ว <b>ไม่ต้องนำเอกสารใดกลับมา</b></div></div>
+        <div class="mou-step"><div class="mou-step-no">3</div><div>โรงพยาบาลจะ <b>ส่งเอกสารมาที่ กทท. เอง</b></div></div>
+        <div class="mou-note">
+          <div style="font-size:11px;font-weight:700;color:#d93025;">⚠️ หมายเหตุ</div>
+          <div style="font-size:11.5px;color:#d93025;margin-top:3px;line-height:1.6;">บางรายการอาจเบิกไม่ได้ ผู้ใช้บริการต้อง <b>ชำระเงินเองที่โรงพยาบาล</b> ในส่วนนั้น</div>
+        </div>
+      </div>
+      <div class="content-card" style="display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;">
+        <span style="font-size:20px;">🔍</span>
+        <input id="mou-input" type="text" placeholder="ค้นหาชื่อโรงพยาบาล / จังหวัด..." oninput="renderMou()"
+          style="flex:1;border:none;background:none;font-family:var(--font);font-size:14px;outline:none;color:#1a3a4a;min-width:0;" />
+      </div>
+      <div id="mou-chips" class="mou-chips"></div>
+      <div id="mou-list"></div>
     </div>
   </div>
 </div>
@@ -1369,6 +1484,124 @@ const hospitals = [
   { name: 'โรงพยาบาลมเหสักข์', type: 'private', direct: false, area: 'กรุงเทพฯ' },
   { name: 'โรงพยาบาลพญาไท (สาขาทั้งหมด)', type: 'private', direct: false, area: 'กรุงเทพฯ' },
 ];
+
+// =====================================================
+// 🤝 MOU HOSPITALS — โรงพยาบาลคู่สัญญา
+// เพิ่มรายการที่นี่ (ฟิลด์ที่ไม่จำเป็นเว้นว่างได้)
+// { name:'โรงพยาบาล...', province:'กรุงเทพฯ', benefit:'สิทธิประโยชน์ตาม MOU',
+//   howto:'วิธีใช้สิทธิ์', phone:'02-xxx-xxxx', mapUrl:'https://maps.google.com/...', expire:'31 ธ.ค. 2569' }
+// =====================================================
+const mouHospitals = [
+  // โรงพยาบาลในกรุงเทพ
+  { name: '(โรงพยาบาล)คลินิกศูนย์แพทย์พัฒนา', province: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลสมเด็จพระปิ่นเกล้า', province: 'กรุงเทพฯ' },
+  { name: 'โรงพยาบาลสวนเบญจกิติ', province: 'กรุงเทพฯ' },
+  // โรงพยาบาลที่ ทลฉ.
+  { name: 'โรงพยาบาลสมเด็จพระบรมราชเทวี ณ ศรีราชา', province: 'ทลฉ. (ชลบุรี)' },
+  { name: 'โรงพยาบาลสมเด็จพระนางเจ้าสิริกิติ์ กรมแพทย์ทหารเรือ ชลบุรี', province: 'ทลฉ. (ชลบุรี)' },
+  { name: 'โรงพยาบาลมหาวิทยาลัยบูรพา ชลบุรี', province: 'ทลฉ. (ชลบุรี)' },
+];
+
+// กลุ่มโรงพยาบาล — key ต้องตรงกับฟิลด์ province ของแต่ละรายการ
+const MOU_GROUPS = {
+  'กรุงเทพฯ':        { title: 'โรงพยาบาลในกรุงเทพ', short: 'กรุงเทพฯ', icon: '🏙️', sub: 'กรุงเทพมหานคร',  color: '#2ab5d4', bg: 'linear-gradient(135deg,#2ab5d4,#1a8fa8)' },
+  'ทลฉ. (ชลบุรี)':   { title: 'โรงพยาบาลที่ ทลฉ.',  short: 'ทลฉ.',    icon: '⚓',  sub: 'พื้นที่ ทลฉ. · จ.ชลบุรี', color: '#7c6fe0', bg: 'linear-gradient(135deg,#9e92f0,#7c6fe0)' }
+};
+const MOU_DEFAULT = { icon: '🏥', color: '#2ab5d4', bg: 'linear-gradient(135deg,#2ab5d4,#1a8fa8)' };
+const mouG = k => Object.assign({ title: k, short: k, sub: '' }, MOU_DEFAULT, MOU_GROUPS[k] || {});
+
+let mouProvince = 'ทั้งหมด';
+function esc(t){ return String(t).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function setMouProvince(p) { mouProvince = p; renderMou(); }
+function toggleMou(el) { el.parentElement.classList.toggle('open'); }
+
+function mouCardHTML(h) {
+  const g = mouG(h.province);
+  const row = (label, val) => val ? `<div class="mou-row"><div class="mou-row-label">${label}</div><div>${esc(val)}</div></div>` : '';
+  const mapUrl = h.mapUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(h.name.replace(/[()]/g, ''));
+  return `
+    <div class="mou-card" style="--g:${g.color};">
+      <div class="mou-card-head" onclick="toggleMou(this)">
+        <div style="font-size:26px;flex-shrink:0;">${g.icon}</div>
+        <div style="flex:1;min-width:0;">
+          <div class="mou-card-name">${esc(h.name)}</div>
+          <div class="mou-card-area">📍 ${esc(g.short)}</div>
+        </div>
+        <span class="mou-badge">MOU</span>
+        <span class="mou-arrow">⌄</span>
+      </div>
+      <div class="mou-card-body">
+        ${row('🎁 สิทธิประโยชน์', h.benefit)}
+        ${row('📝 วิธีใช้สิทธิ์', h.howto)}
+        ${row('📅 สัญญาถึง', h.expire)}
+        <div class="mou-actions">
+          ${h.phone ? `<a class="mou-btn" href="tel:${esc(h.phone.replace(/[^0-9+]/g,''))}">📞 โทร ${esc(h.phone)}</a>` : ''}
+          <a class="mou-btn ${h.phone ? 'alt' : ''}" href="${esc(mapUrl)}" target="_blank" rel="noopener">🗺️ ดูแผนที่</a>
+        </div>
+      </div>
+    </div>`;
+}
+
+function renderMou() {
+  const countEl = document.getElementById('mou-count');
+  if (countEl) countEl.textContent = mouHospitals.length;
+  const listEl = document.getElementById('mou-list');
+  if (!listEl) return;
+  const q = (document.getElementById('mou-input').value || '').trim().toLowerCase();
+
+  const keys = [...new Set(mouHospitals.map(h => h.province).filter(Boolean))];
+  if (mouProvince !== 'ทั้งหมด' && !keys.includes(mouProvince)) mouProvince = 'ทั้งหมด';
+
+  // แท็บแยกกลุ่ม (ทั้งหมด / กรุงเทพฯ / ทลฉ.)
+  const tab = (key, label, count) => {
+    const active = key === mouProvince;
+    const style = active && key !== 'ทั้งหมด' ? `style="--g:${mouG(key).bg};"` : '';
+    return `<button class="htab ${active ? 'htab-active' : ''}" ${style} onclick="setMouProvince(this.dataset.p)" data-p="${esc(key)}">${label} (${count})</button>`;
+  };
+  document.getElementById('mou-chips').innerHTML = keys.length > 1
+    ? `<div class="mou-seg">${tab('ทั้งหมด', 'ทั้งหมด', mouHospitals.length)}${keys.map(k => tab(k, mouG(k).icon + ' ' + mouG(k).short, mouHospitals.filter(h => h.province === k).length)).join('')}</div>`
+    : '';
+
+  if (!mouHospitals.length) {
+    listEl.innerHTML = '<div style="text-align:center;padding:40px 20px;color:#6b8a9a;font-size:13px;line-height:1.7;"><div style="font-size:40px;margin-bottom:8px;">🤝</div>อยู่ระหว่างปรับปรุงรายชื่อโรงพยาบาลคู่สัญญา MOU<br>กรุณาติดต่อเจ้าหน้าที่เพื่อสอบถามข้อมูลเพิ่มเติม</div>';
+    return;
+  }
+
+  const shown = mouHospitals.filter(h =>
+    (mouProvince === 'ทั้งหมด' || h.province === mouProvince) &&
+    (!q || (h.name + ' ' + mouG(h.province).short).toLowerCase().includes(q)));
+  if (!shown.length) {
+    listEl.innerHTML = '<div style="text-align:center;padding:30px;color:#aaa;font-size:13px;">ไม่พบโรงพยาบาลที่ค้นหา</div>';
+    return;
+  }
+
+  // แสดงเป็นส่วนๆ แยกหัวข้อชัดเจนตามกลุ่ม
+  listEl.innerHTML = keys.filter(k => shown.some(h => h.province === k)).map(k => {
+    const g = mouG(k), items = shown.filter(h => h.province === k);
+    return `<div class="mou-group-head" style="background:${g.bg};">
+        <span class="g-ico">${g.icon}</span>
+        <div><div>${esc(g.title)}</div>${g.sub ? `<div class="g-sub">${esc(g.sub)}</div>` : ''}</div>
+        <span class="g-count">${items.length} แห่ง</span>
+      </div>` + items.map(mouCardHTML).join('');
+  }).join('');
+}
+
+// ===== ข้อมูล MOU ใช้ร่วมกับ AI ถาม-ตอบ และ FAQ =====
+function mouListHTML() {
+  const keys = [...new Set(mouHospitals.map(h => h.province).filter(Boolean))];
+  return keys.map(k => {
+    const g = mouG(k);
+    return `<b>${g.icon} ${esc(g.title)}</b><br>` + mouHospitals.filter(h => h.province === k).map(h => `• ${esc(h.name)}`).join('<br>');
+  }).join('<br><br>');
+}
+const MOU_HOWTO_HTML = `1️⃣ <b>ยื่นบัตรประชาชน</b> ตอนเข้าใช้บริการได้เลย<br>2️⃣ รับการรักษาตามปกติ <b>ไม่ต้องนำเอกสารใดกลับมา</b><br>3️⃣ โรงพยาบาลจะ <b>ส่งเอกสารมาที่ กทท. เอง</b><br><br>⚠️ <b>หมายเหตุ:</b> บางรายการอาจเบิกไม่ได้ ต้อง<b>ชำระเงินเองที่โรงพยาบาล</b>ในส่วนนั้น`;
+const MOU_BTN_HTML = `<br><br><button onclick="goTo('screen-mou')" style="background:linear-gradient(135deg,#2ab5d4,#1a8fa8);color:#fff;border:none;border-radius:12px;padding:9px 16px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;">🤝 ดูรายชื่อ รพ. MOU</button>`;
+function fillMouFaq() {
+  const el = document.getElementById('faq-mou-list');
+  if (el) el.innerHTML = mouListHTML() + MOU_BTN_HTML;
+}
+document.addEventListener('DOMContentLoaded', () => { renderMou(); fillMouFaq(); });
 
 let hospFilter = 'all';
 let nearbyCoords = null;
@@ -1967,6 +2200,11 @@ function goTo(id) {
   if (id === 'screen-check' && !drugsLoaded) {
     loadDrugs();
   }
+  if (id === 'screen-mou') {
+    document.getElementById('mou-input').value = '';
+    mouProvince = 'ทั้งหมด';
+    renderMou();
+  }
   // รีเซ็ตหน้าโรงพยาบาลทุกครั้งที่เปิด
   if (id === 'screen-hospital') {
     resetHospitalScreen();
@@ -2066,6 +2304,10 @@ function tf(item) { item.classList.toggle('open'); }
 // 🤖 AI ถาม-ตอบ — ตอบจากฐานข้อมูลภายในเท่านั้น
 // =====================================================
 const AI_QA = [
+  // 🤝 MOU — priority: ถ้าคำถามเกี่ยวกับ รพ. MOU จะตอบข้อนี้ก่อนเสมอ (ชื่อ รพ. ใน mouHospitals จับให้อัตโนมัติ)
+  { priority: true,
+    keys:['mou','เอ็มโอยู','คู่สัญญา','ศูนย์แพทย์พัฒนา','ปิ่นเกล้า','เบญจกิติ','ศรีราชา','สมเด็จพระบรมราชเทวี','สิริกิติ์','กรมแพทย์ทหารเรือ','บูรพา','แหลมฉบัง','ทลฉ'],
+    a: () => `🤝 <b>โรงพยาบาลคู่สัญญา MOU</b><br><br>${mouListHTML()}<br><br>📌 <b>วิธีใช้บริการ</b><br>${MOU_HOWTO_HTML}${MOU_BTN_HTML}` },
   { keys:['เอกชน','วงเงิน','เบิกได้เท่าไหร่','เบิกได้เท่าไร','เบิกเท่าไหร่','113'],
     a:`🏢 <b>รพ.เอกชน (IPD) — จำกัดวงเงิน</b><br><br>💰 วงเงินสูงสุด <b>113,520 บาท/ปี</b><br>🛏️ ค่าห้องพัก ≤ 1,500 บ./วัน (พนักงาน) / ≤ 1,100 บ./วัน (ครอบครัว)<br>📌 เบิกได้ครึ่งหนึ่งของรายการที่เบิกได้<br>💊 ค่าเวชภัณฑ์อ้างอิงกรมบัญชีกลาง` },
   { keys:['รัฐ','ipd','ผู้ป่วยใน','นอน','admit'],
@@ -2094,12 +2336,20 @@ const AI_QA = [
 
 function findAIAnswer(q) {
   const input = q.toLowerCase();
+  const val = a => typeof a === 'function' ? a() : a;
+  // คำถามเกี่ยวกับ รพ. MOU (คำสำคัญ หรือชื่อ รพ. ในรายการ MOU) → ตอบก่อนเสมอ
+  const mouByName = mouHospitals.some(h => {
+    const core = h.name.replace(/[()]/g, '').replace('โรงพยาบาล', '').trim().toLowerCase();
+    return core.length > 3 && input.includes(core);
+  });
+  const pri = AI_QA.find(it => it.priority && (mouByName || it.keys.some(k => input.includes(k.toLowerCase()))));
+  if (pri) return val(pri.a);
   let best = null, score = 0;
   for (const item of AI_QA) {
     const s = item.keys.filter(k => input.includes(k.toLowerCase())).length;
     if (s > score) { score = s; best = item; }
   }
-  if (score > 0) return best.a;
+  if (score > 0) return val(best.a);
   return `ขออภัยครับ ไม่พบข้อมูลที่ตรงกับคำถามนี้ในระบบ<br><br>📞 กรุณาติดต่อเจ้าหน้าที่โดยตรง<br><b>สำนักแพทย์ กทท. โทร 02-269-5599</b>`;
 }
 
@@ -2269,6 +2519,7 @@ const SCREEN_LABELS = {
   'screen-contact':  { label: 'ติดต่อเจ้าหน้าที่',    icon: '📞' },
   'screen-ai':       { label: 'AI ถาม-ตอบ',            icon: '🤖' },
   'screen-hospital': { label: 'ค้นหาโรงพยาบาล',       icon: '🗺️' },
+  'screen-mou': { label: 'โรงพยาบาลคู่สัญญา MOU', icon: '🤝' },
 };
 
 function getStats() {
