@@ -635,6 +635,12 @@ html, body {
 .mou-step { display: flex; gap: 10px; align-items: flex-start; font-size: 12.5px; color: #1a3a4a; line-height: 1.5; margin-bottom: 8px; }
 .mou-step-no { flex-shrink: 0; width: 22px; height: 22px; border-radius: 50%; background: linear-gradient(135deg,#2ab5d4,#1a8fa8); color: #fff; font-size: 12px; font-weight: 800; display: flex; align-items: center; justify-content: center; margin-top: 1px; }
 .mou-note { margin-top: 4px; padding: 10px 14px; background: rgba(217,48,37,0.08); border-left: 3px solid #d93025; border-radius: 8px; }
+
+.mou-use { display: inline-block; margin-top: 5px; padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+.mou-badge.soon { background: #f5a623; }
+.mou-soon-note { margin-top: 4px; font-size: 11px; color: #b36b00; font-weight: 600; line-height: 1.4; }
+.mou-scope { display: inline-block; margin: -4px 0 10px; padding: 3px 10px; border-radius: 20px; background: rgba(42,181,212,0.14); color: #1a8fa8; font-size: 11.5px; font-weight: 700; }
+.mou-contact { margin-top: 14px; padding: 12px 16px; border-radius: 16px; background: #ffe27a; color: #1a3a4a; font-size: 12.5px; font-weight: 700; line-height: 1.6; text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.08); }
 </style>
 </head>
 <body>
@@ -720,7 +726,7 @@ html, body {
     <div class="mou-banner-icon">🤝</div>
     <div class="mou-banner-text">
       <div class="mou-banner-title">รพ.คู่สัญญา MOU <span class="mou-count" id="mou-count">0</span></div>
-      <div class="mou-banner-sub">ยื่นบัตรประชาชน ไม่ต้องสำรองจ่าย</div>
+      <div class="mou-banner-sub" id="mou-banner-sub"></div>
     </div>
     <div class="mou-banner-arrow">›</div>
   </div>
@@ -1238,7 +1244,7 @@ html, body {
     </div>
     <div class="content-area">
       <div class="tip-box">💡 แตะที่คำถามเพื่อดูคำตอบ</div>
-      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🤝</span>ไปใช้บริการ รพ. MOU ต้องทำอย่างไร?<span class="faq-arrow">⌄</span></div><div class="faq-a">1️⃣ <b>ยื่นบัตรประชาชน</b> เมื่อเข้ารับบริการ<br>2️⃣ รับการรักษาตามปกติ โดย<b>ไม่ต้องสำรองจ่าย</b><br>3️⃣ โรงพยาบาล<b>ดำเนินการด้านเอกสารกับ กทท. โดยตรง</b><br><br>⚠️ <b>หมายเหตุ:</b> บางรายการที่ไม่สามารถเบิกได้ ผู้ใช้บริการต้อง<b>ชำระเงินตามใบเสร็จที่โรงพยาบาล</b><br>กรณีรายการดังกล่าวเข้าเงื่อนไขรายการที่เบิกได้ตามระเบียบ กทท. <b>ให้ติดต่อเจ้าหน้าที่ต่อไป</b><br><br><button onclick="goTo('screen-mou')" style="background:linear-gradient(135deg,#2ab5d4,#1a8fa8);color:#fff;border:none;border-radius:12px;padding:9px 16px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;">🤝 ดูรายชื่อ รพ. MOU</button></div></div>
+      <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🤝</span>ไปใช้บริการ รพ. MOU ต้องทำอย่างไร?<span class="faq-arrow">⌄</span></div><div class="faq-a" id="faq-mou-howto"></div></div>
       <div class="faq-item"><div class="faq-q" onclick="tf(this.parentElement)"><span class="faq-icon">🏥</span>รพ. MOU มีที่ไหนบ้าง?<span class="faq-arrow">⌄</span></div><div class="faq-a" id="faq-mou-list"></div></div>
 
 
@@ -1364,14 +1370,9 @@ html, body {
     </div>
     <div class="content-area">
       <div class="mou-howto">
-        <div class="mou-howto-title">📌 วิธีใช้บริการ รพ. คู่สัญญา MOU</div>
-        <div class="mou-step"><div class="mou-step-no">1</div><div><b>ยื่นบัตรประชาชน</b> เมื่อเข้ารับบริการ</div></div>
-        <div class="mou-step"><div class="mou-step-no">2</div><div>รับการรักษาตามปกติ โดย<b>ไม่ต้องสำรองจ่าย</b></div></div>
-        <div class="mou-step"><div class="mou-step-no">3</div><div>โรงพยาบาล<b>ดำเนินการด้านเอกสารกับ กทท. โดยตรง</b></div></div>
-        <div class="mou-note">
-          <div style="font-size:11px;font-weight:700;color:#d93025;">⚠️ หมายเหตุ</div>
-          <div style="font-size:11.5px;color:#d93025;margin-top:3px;line-height:1.6;">บางรายการที่ไม่สามารถเบิกได้ ผู้ใช้บริการต้อง<b>ชำระเงินตามใบเสร็จที่โรงพยาบาล</b><br>กรณีรายการดังกล่าวเข้าเงื่อนไขรายการที่เบิกได้ตามระเบียบ กทท. <b>ให้ติดต่อเจ้าหน้าที่ต่อไป</b></div>
-        </div>
+        <div class="mou-howto-title" id="mou-howto-title"></div>
+        <div class="mou-scope" id="mou-scope"></div>
+        <div id="mou-howto-body"></div>
       </div>
       <div class="content-card" style="display:flex;align-items:center;gap:10px;padding:12px 16px;margin-bottom:12px;">
         <span style="font-size:20px;">🔍</span>
@@ -1380,6 +1381,7 @@ html, body {
       </div>
       <div id="mou-chips" class="mou-chips"></div>
       <div id="mou-list"></div>
+      <div class="mou-contact" id="mou-contact"></div>
     </div>
   </div>
 </div>
@@ -1437,6 +1439,29 @@ html, body {
 
 
 <script>
+// =====================================================================
+// ✏️ แก้ข้อความที่นี่ — ข้อความเรื่อง รพ. MOU (แก้ที่เดียว เปลี่ยนครบทั้ง หน้า MOU / FAQ / AI / หน้าหลัก)
+//   • ใช้ **ข้อความ** เพื่อทำตัวหนา
+//   • ข้อความอยู่ในเครื่องหมาย ' ' ห้ามลบเครื่องหมายนี้ และห้ามใส่ ' ในข้อความ
+//   • แก้เสร็จกด Ctrl+S (Encoding: UTF-8) แล้วรีเฟรชหน้าเว็บด้วย Ctrl+F5
+// =====================================================================
+const MOU_TEXT = {
+  banner: 'สิทธิผู้ป่วยนอก ไม่ต้องสำรองจ่าย',           // ข้อความใต้ชื่อในแบนเนอร์หน้าหลัก
+  title:  'วิธีใช้บริการ รพ. คู่สัญญา MOU',               // หัวข้อกล่องวิธีใช้
+  scope:  'ครอบคลุม**ผู้ป่วยนอก**',                       // ป้ายใต้หัวข้อ
+  contact:'สอบถามได้ที่ **สำนักแพทย์และอนามัย** โทร **8-9311 , 8-9346**',   // กล่องสีเหลืองท้ายหน้า MOU
+  steps: [                                                 // ขั้นตอน (เพิ่ม/ลบได้ ขึ้นบรรทัดละ 1 ข้อ คั่นด้วยจุลภาค)
+    '**ใช้เอกสารตามที่โรงพยาบาลกำหนด** (บัตรประจำตัวประชาชน หรือหนังสือส่งตัว รพ.16) เมื่อเข้ารับบริการ',
+    'รับการรักษาตามปกติ โดย**ไม่ต้องสำรองจ่าย**',
+    'โรงพยาบาล**ดำเนินการด้านเอกสารกับ กทท. โดยตรง**'
+  ],
+  note: [                                                  // หมายเหตุ (กล่องสีแดง) บรรทัดละ 1 ข้อ
+    'บางรายการที่ไม่สามารถเบิกได้ ผู้ใช้บริการต้อง**ชำระเงินตามใบเสร็จที่โรงพยาบาล**',
+    'กรณีรายการดังกล่าวเข้าเงื่อนไขรายการที่เบิกได้ตามระเบียบ กทท. **ให้ติดต่อเจ้าหน้าที่ต่อไป**'
+  ]
+};
+const mouFmt = t => String(t).replace(/[&<>]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[c])).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/(\d)-(\d)/g, '$1\u2011$2');
+// =====================================================================
 // =====================================================
 // 🔧 URL จาก Google Apps Script
 // =====================================================
@@ -1492,20 +1517,29 @@ const hospitals = [
 //   howto:'วิธีใช้สิทธิ์', phone:'02-xxx-xxxx', mapUrl:'https://maps.google.com/...', expire:'31 ธ.ค. 2569' }
 // =====================================================
 const mouHospitals = [
-  // โรงพยาบาลในกรุงเทพ
-  { name: '(โรงพยาบาล)คลินิกศูนย์แพทย์พัฒนา', province: 'กรุงเทพฯ' },
-  { name: 'โรงพยาบาลสมเด็จพระปิ่นเกล้า', province: 'กรุงเทพฯ' },
-  { name: 'โรงพยาบาลสวนเบญจกิติ', province: 'กรุงเทพฯ' },
-  // โรงพยาบาลที่ ทลฉ.
-  { name: 'โรงพยาบาลสมเด็จพระบรมราชเทวี ณ ศรีราชา', province: 'ทลฉ. (ชลบุรี)' },
-  { name: 'โรงพยาบาลสมเด็จพระนางเจ้าสิริกิติ์ กรมแพทย์ทหารเรือ ชลบุรี', province: 'ทลฉ. (ชลบุรี)' },
-  { name: 'โรงพยาบาลมหาวิทยาลัยบูรพา ชลบุรี', province: 'ทลฉ. (ชลบุรี)' },
+  // use: 'id' = ใช้บัตรประจำตัวประชาชน | 'referral' = ใช้หนังสือส่งตัว (รพ.16) | soon:true = Coming soon
+  // ---- จ.ชลบุรี ----
+  { name: 'โรงพยาบาลสมเด็จพระบรมราชเทวี ณ ศรีราชา', province: 'ชลบุรี', use: 'referral' },
+  { name: 'โรงพยาบาลสมเด็จพระนางเจ้าสิริกิติ์',      province: 'ชลบุรี', use: 'referral' },
+  { name: 'โรงพยาบาลมหาวิทยาลัยบูรพา',               province: 'ชลบุรี', use: 'referral' },
+  // ---- กรุงเทพมหานคร ----
+  { name: 'โรงพยาบาลสวนเบญจกิติ เฉลิมพระเกียรติ 84 พรรษา', province: 'กรุงเทพฯ', use: 'id' },
+  { name: 'โรงพยาบาลสมเด็จพระปิ่นเกล้า',             province: 'กรุงเทพฯ', use: 'referral' },
+  { name: 'คลินิกศูนย์แพทย์พัฒนา',                    province: 'กรุงเทพฯ', use: 'id' },
+  { name: 'โรงพยาบาลจุฬาลงกรณ์',                      province: 'กรุงเทพฯ', use: 'id' },
+  { name: 'โรงพยาบาลศิริราช',                         province: 'กรุงเทพฯ', use: 'id', soon: true, note: 'รอประชาสัมพันธ์ ให้เริ่มใช้สิทธิเมื่อไหร่' },
 ];
+const mouActive = () => mouHospitals.filter(h => !h.soon);
+const MOU_USE = {
+  id:       { icon: '🪪', label: 'ใช้บัตรประจำตัวประชาชน',     bg: 'rgba(76,175,80,0.14)',  fg: '#2e7d32' },
+  referral: { icon: '📄', label: 'ใช้หนังสือส่งตัว (รพ.16)',    bg: 'rgba(232,68,122,0.12)', fg: '#c2185b' }
+};
+
 
 // กลุ่มโรงพยาบาล — key ต้องตรงกับฟิลด์ province ของแต่ละรายการ
 const MOU_GROUPS = {
-  'กรุงเทพฯ':        { title: 'โรงพยาบาลในกรุงเทพ', short: 'กรุงเทพฯ', icon: '🏙️', sub: 'กรุงเทพมหานคร',  color: '#2ab5d4', bg: 'linear-gradient(135deg,#2ab5d4,#1a8fa8)' },
-  'ทลฉ. (ชลบุรี)':   { title: 'โรงพยาบาลที่ ทลฉ.',  short: 'ทลฉ.',    icon: '⚓',  sub: 'พื้นที่ ทลฉ. · จ.ชลบุรี', color: '#7c6fe0', bg: 'linear-gradient(135deg,#9e92f0,#7c6fe0)' }
+  'ชลบุรี':    { title: 'โรงพยาบาลในจังหวัดชลบุรี', short: 'ชลบุรี',    icon: '🌴', sub: 'จ.ชลบุรี',        color: '#2f6fdb', bg: 'linear-gradient(135deg,#5b9bf0,#2f6fdb)' },
+  'กรุงเทพฯ': { title: 'โรงพยาบาลในกรุงเทพมหานคร', short: 'กรุงเทพฯ', icon: '🏙️', sub: 'กรุงเทพมหานคร', color: '#e8447a', bg: 'linear-gradient(135deg,#f77fa6,#e8447a)' }
 };
 const MOU_DEFAULT = { icon: '🏥', color: '#2ab5d4', bg: 'linear-gradient(135deg,#2ab5d4,#1a8fa8)' };
 const mouG = k => Object.assign({ title: k, short: k, sub: '' }, MOU_DEFAULT, MOU_GROUPS[k] || {});
@@ -1517,7 +1551,7 @@ function setMouProvince(p) { mouProvince = p; renderMou(); }
 function toggleMou(el) { el.parentElement.classList.toggle('open'); }
 
 function mouCardHTML(h) {
-  const g = mouG(h.province);
+  const g = mouG(h.province), u = MOU_USE[h.use];
   const row = (label, val) => val ? `<div class="mou-row"><div class="mou-row-label">${label}</div><div>${esc(val)}</div></div>` : '';
   const mapUrl = h.mapUrl || 'https://www.google.com/maps/search/?api=1&query=' + encodeURIComponent(h.name.replace(/[()]/g, ''));
   return `
@@ -1527,8 +1561,10 @@ function mouCardHTML(h) {
         <div style="flex:1;min-width:0;">
           <div class="mou-card-name">${esc(h.name)}</div>
           <div class="mou-card-area">📍 ${esc(g.short)}</div>
+          ${u ? `<div class="mou-use" style="background:${u.bg};color:${u.fg};">${u.icon} ${u.label}</div>` : ''}
+          ${h.soon && h.note ? `<div class="mou-soon-note">📣 ${esc(h.note)}</div>` : ''}
         </div>
-        <span class="mou-badge">MOU</span>
+        <span class="mou-badge ${h.soon ? 'soon' : ''}">${h.soon ? 'Coming soon' : 'MOU'}</span>
         <span class="mou-arrow">⌄</span>
       </div>
       <div class="mou-card-body">
@@ -1545,7 +1581,7 @@ function mouCardHTML(h) {
 
 function renderMou() {
   const countEl = document.getElementById('mou-count');
-  if (countEl) countEl.textContent = mouHospitals.length;
+  if (countEl) countEl.textContent = mouActive().length;
   const listEl = document.getElementById('mou-list');
   if (!listEl) return;
   const q = (document.getElementById('mou-input').value || '').trim().toLowerCase();
@@ -1560,7 +1596,7 @@ function renderMou() {
     return `<button class="htab ${active ? 'htab-active' : ''}" ${style} onclick="setMouProvince(this.dataset.p)" data-p="${esc(key)}">${label} (${count})</button>`;
   };
   document.getElementById('mou-chips').innerHTML = keys.length > 1
-    ? `<div class="mou-seg">${tab('ทั้งหมด', 'ทั้งหมด', mouHospitals.length)}${keys.map(k => tab(k, mouG(k).icon + ' ' + mouG(k).short, mouHospitals.filter(h => h.province === k).length)).join('')}</div>`
+    ? `<div class="mou-seg">${tab('ทั้งหมด', 'ทั้งหมด', mouActive().length)}${keys.map(k => tab(k, mouG(k).icon + ' ' + mouG(k).short, mouActive().filter(h => h.province === k).length)).join('')}</div>`
     : '';
 
   if (!mouHospitals.length) {
@@ -1582,7 +1618,7 @@ function renderMou() {
     return `<div class="mou-group-head" style="background:${g.bg};">
         <span class="g-ico">${g.icon}</span>
         <div><div>${esc(g.title)}</div>${g.sub ? `<div class="g-sub">${esc(g.sub)}</div>` : ''}</div>
-        <span class="g-count">${items.length} แห่ง</span>
+        <span class="g-count">${items.filter(h => !h.soon).length} แห่ง</span>
       </div>` + items.map(mouCardHTML).join('');
   }).join('');
 }
@@ -1592,16 +1628,30 @@ function mouListHTML() {
   const keys = [...new Set(mouHospitals.map(h => h.province).filter(Boolean))];
   return keys.map(k => {
     const g = mouG(k);
-    return `<b>${g.icon} ${esc(g.title)}</b><br>` + mouHospitals.filter(h => h.province === k).map(h => `• ${esc(h.name)}`).join('<br>');
+    return `<b>${g.icon} ${esc(g.title)}</b><br>` + mouHospitals.filter(h => h.province === k).map(h => {
+      const u = MOU_USE[h.use];
+      return `• ${esc(h.name)}${h.soon ? ' <b>(Coming soon — ' + esc(h.note || 'รอประชาสัมพันธ์') + ')</b>' : ''}${u ? '<br>&nbsp;&nbsp;&nbsp;' + u.icon + ' ' + u.label : ''}`;
+    }).join('<br>');
   }).join('<br><br>');
 }
-const MOU_HOWTO_HTML = `1️⃣ <b>ยื่นบัตรประชาชน</b> เมื่อเข้ารับบริการ<br>2️⃣ รับการรักษาตามปกติ โดย<b>ไม่ต้องสำรองจ่าย</b><br>3️⃣ โรงพยาบาล<b>ดำเนินการด้านเอกสารกับ กทท. โดยตรง</b><br><br>⚠️ <b>หมายเหตุ:</b> บางรายการที่ไม่สามารถเบิกได้ ผู้ใช้บริการต้อง<b>ชำระเงินตามใบเสร็จที่โรงพยาบาล</b><br>กรณีรายการดังกล่าวเข้าเงื่อนไขรายการที่เบิกได้ตามระเบียบ กทท. <b>ให้ติดต่อเจ้าหน้าที่ต่อไป</b>`;
+const MOU_HOWTO_HTML = `${MOU_TEXT.steps.map((t, i) => ['1️⃣','2️⃣','3️⃣','4️⃣','5️⃣'][i] + ' ' + mouFmt(t)).join('<br>')}<br><br>⚠️ <b>หมายเหตุ:</b> ${MOU_TEXT.note.map(mouFmt).join('<br>')}<br><br>📞 ${mouFmt(MOU_TEXT.contact)}`;
 const MOU_BTN_HTML = `<br><br><button onclick="goTo('screen-mou')" style="background:linear-gradient(135deg,#2ab5d4,#1a8fa8);color:#fff;border:none;border-radius:12px;padding:9px 16px;font-size:12px;font-weight:700;font-family:var(--font);cursor:pointer;">🤝 ดูรายชื่อ รพ. MOU</button>`;
+function fillMouText() {
+  const set = (id, html) => { const el = document.getElementById(id); if (el) el.innerHTML = html; };
+  set('mou-banner-sub', esc(MOU_TEXT.banner));
+  set('mou-howto-title', '📌 ' + esc(MOU_TEXT.title));
+  set('mou-scope', '🏥 ' + mouFmt(MOU_TEXT.scope));
+  set('mou-contact', '📞 ' + mouFmt(MOU_TEXT.contact));
+  set('mou-howto-body',
+    MOU_TEXT.steps.map((t, i) => `<div class="mou-step"><div class="mou-step-no">${i + 1}</div><div>${mouFmt(t)}</div></div>`).join('') +
+    `<div class="mou-note"><div style="font-size:11px;font-weight:700;color:#d93025;">⚠️ หมายเหตุ</div><div style="font-size:11.5px;color:#d93025;margin-top:3px;line-height:1.6;">${MOU_TEXT.note.map(mouFmt).join('<br>')}</div></div>`);
+  set('faq-mou-howto', MOU_HOWTO_HTML + MOU_BTN_HTML);
+}
 function fillMouFaq() {
   const el = document.getElementById('faq-mou-list');
   if (el) el.innerHTML = mouListHTML() + MOU_BTN_HTML;
 }
-document.addEventListener('DOMContentLoaded', () => { renderMou(); fillMouFaq(); });
+document.addEventListener('DOMContentLoaded', () => { renderMou(); fillMouFaq(); fillMouText(); });
 
 let hospFilter = 'all';
 let nearbyCoords = null;
@@ -2306,8 +2356,8 @@ function tf(item) { item.classList.toggle('open'); }
 const AI_QA = [
   // 🤝 MOU — priority: ถ้าคำถามเกี่ยวกับ รพ. MOU จะตอบข้อนี้ก่อนเสมอ (ชื่อ รพ. ใน mouHospitals จับให้อัตโนมัติ)
   { priority: true,
-    keys:['mou','เอ็มโอยู','คู่สัญญา','ศูนย์แพทย์พัฒนา','ปิ่นเกล้า','เบญจกิติ','ศรีราชา','สมเด็จพระบรมราชเทวี','สิริกิติ์','กรมแพทย์ทหารเรือ','บูรพา','แหลมฉบัง','ทลฉ'],
-    a: () => `🤝 <b>โรงพยาบาลคู่สัญญา MOU</b><br><br>${mouListHTML()}<br><br>📌 <b>วิธีใช้บริการ</b><br>${MOU_HOWTO_HTML}${MOU_BTN_HTML}` },
+    keys:['mou','เอ็มโอยู','คู่สัญญา','ศูนย์แพทย์พัฒนา','ปิ่นเกล้า','เบญจกิติ','ศรีราชา','สมเด็จพระบรมราชเทวี','สิริกิติ์','กรมแพทย์ทหารเรือ','บูรพา','แหลมฉบัง','ทลฉ','จุฬา','ศิริราช','ชลบุรี','หนังสือส่งตัว','รพ.16'],
+    a: () => `🤝 <b>โรงพยาบาลคู่สัญญา MOU</b> (${mouFmt(MOU_TEXT.scope)})<br><br>${mouListHTML()}<br><br>📌 <b>วิธีใช้บริการ</b><br>${MOU_HOWTO_HTML}${MOU_BTN_HTML}` },
   { keys:['เอกชน','วงเงิน','เบิกได้เท่าไหร่','เบิกได้เท่าไร','เบิกเท่าไหร่','113'],
     a:`🏢 <b>รพ.เอกชน (IPD) — จำกัดวงเงิน</b><br><br>💰 วงเงินสูงสุด <b>113,520 บาท/ปี</b><br>🛏️ ค่าห้องพัก ≤ 1,500 บ./วัน (พนักงาน) / ≤ 1,100 บ./วัน (ครอบครัว)<br>📌 เบิกได้ครึ่งหนึ่งของรายการที่เบิกได้<br>💊 ค่าเวชภัณฑ์อ้างอิงกรมบัญชีกลาง` },
   { keys:['รัฐ','ipd','ผู้ป่วยใน','นอน','admit'],
